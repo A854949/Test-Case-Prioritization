@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <span class="menu-icon" style="font-size:25px;cursor:pointer" onclick="openNav()">&#9776;</span>
+                <a class="navbar-brand" href="/">
+                    <span style="display: flex; align-items: center;">
+                        <img src="/static/favicon.ico" height='22' alt="Favicon" class="favicon">
+                        <strong style="margin-left: 10px;">Test Case Prioritization</strong>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+
+
+    <div id="sidebar" class="sidebar">
+        <a href="task_report">Task Report</a>
+        <!-- 更多链接 -->
+    </div>
+
+    <div id="main" class="main-content">
+        <!-- 原有的页面内容 -->
+    </div>
+
+    <script>
+        window.addEventListener('popstate', function(event) {
+            // 当用户点击后退按钮时，执行这里的代码
+            closeSidebar(); // 调用一个函数来关闭侧边栏
+        });
+
+        function closeSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main");
+            sidebar.style.width = "0";
+            mainContent.style.marginLeft = "0";
+        }
+
+        // 确保 openNav 函数不会与 closeSidebar 冲突
+        function openNav() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main");
+            if (sidebar.style.width === "250px") {
+                closeSidebar();
+            } else {
+                sidebar.style.width = "250px";
+                mainContent.style.marginLeft = "250px";
+            }
+        }
+            
+    </script>
+
+<style>
+ .navbar.fixed-top {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    
+}
+    
+.navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 15px;
+}
+
+    
+.navbar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* 从左侧开始 */
+       
+    }
+    
+
+.menu-icon {
+    font-size: 25px;
+    cursor: pointer;
+    z-index: 1100;
+    color: #ffffff;
+    /* 移除绝对定位 */
+}
+
+    .main-content {
+        margin-left: 0; /* 初始状态下没有边距 */
+        transition: margin-left 0.5s; /* 平滑过渡效果 */
+        /* 其他必要样式 */
+    }
+
+    .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1100;
+        top: 66px; /* 根据导航栏高度调整 */
+        left: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px; /* 根据需要调整 */
+    }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+
+
+        @media screen and (max-height: 450px) {
+            .sidebar {padding-top: 15px;}
+            .sidebar a {font-size: 18px;}
+        }
+</style>
+
+</body>
+</html>

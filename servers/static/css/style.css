@@ -1,0 +1,163 @@
+    html {
+        min-height: 100%;
+        position: relative;
+    }
+
+    body {
+        margin-bottom: 150px;
+    }
+
+    .container {
+        min-height: calc(100% - 100px); /* 假设页脚高度为60px */
+        padding-bottom: 60px; /* 页脚高度的底部间距 */
+    }    
+
+    .custom-background {
+        background-color: #f0f0f088; /* 设置背景颜色 */
+        padding: 25px; /* 调整内边距以增加大小 */
+        margin-top:20px;
+        margin-bottom: 20px;
+    }
+
+    
+    .custom-checkbox {
+        margin-top: 10px;
+    }
+
+    .custom-checkbox .form-check-input {
+        width: 25px; /* 调整复选框的宽度 */
+        height: 25px; /* 调整复选框的高度 */
+    }
+
+
+    #outputTable_wrapper .dataTables_scrollBody{
+        margin-bottom: 10px;
+    }
+
+    #outputTable_wrapper .dataTables_scrollHead th {
+        background-color: #b5e4f5;
+    }
+    
+    
+    #outputTable_wrapper .dataTables_scrollHead th::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #888; /* 邊框顏色 */
+        box-shadow: 0 0 0 0 #888; /* 右側陰影 */
+    }
+
+    #outputTable_wrapper .dataTables_scrollBody td {
+        border: 1px solid #ddd;
+    }
+    
+    #outputTable tbody tr:hover {
+        background-color: #f0f0f0; /* 設置懸停時的背景顏色為灰色 */
+    }
+
+    .form-group > label.form-check-label {
+        margin-right: 6px; /* 在"label"的右侧添加空格 */
+        margin-left: 20px; /* 在"label"的左侧添加空格 */
+        margin-top: 10px;
+    }
+
+    /* 设置选择框的宽度 */
+    #taskIdSelect, #projectSelect, #phaseSelect, #categorySelect, #caseTitleSelect {
+        width: 25%; /* 或者您可以使用百分比，例如 100% */
+    }
+
+    #caseTitleSelect {
+        width: 50%; /* 或者您可以使用百分比，例如 100% */
+    }
+
+    #clearAllButton {
+        background-color: #6bc8fdd4;
+        margin-left: 10px; /* 调整间隔 */
+        margin-top: 10px;
+        border-color: #80cffdd4#6bc8fdd4; /* 设置边框颜色 */
+    }
+   
+    #clearAllButton:hover {
+        background-color: #24bdf0; /* 鼠标悬停时的颜色 */
+        border-color: #24bdf0; /* 鼠标悬停时的边框颜色 */
+    }
+
+    .toggle-button {
+        cursor: pointer;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+    }
+
+    td.ellipsis-cell {
+        max-width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: relative;
+    }
+
+    td.ellipsis-cell .has-data {
+        cursor: pointer; /* 只為有數據的單元格設定指針樣式 */
+    }
+
+    td.redirect-cell .clickable {
+        color: #007bff; /* 超連結的藍色 */
+        text-decoration: none;
+        cursor: pointer; /* 變更鼠標樣式為手指指標，表示可點擊 */
+    }
+
+    td.redirect-cell .clickable:hover {
+        color: #004b9b; /* 超連結的藍色 */
+    }
+
+    .modal-dialog.custom-modal-size {
+        max-width: 800px; /* 或者你想要的任何寬度 */
+        margin: auto; /* 水平居中 */
+        display: flex; /* 使用 Flexbox */
+        align-items: center; /* 垂直居中 */
+        min-height: calc(100% - (.5rem * 2)); /* 最小高度，減去邊距 */
+    }
+
+    .modal-dialog.custom-modal-size .close {
+        margin-left: auto;
+        color: #45454588; /* 設置文字顏色 */
+        background-color: white; /* 背景顏色 */
+        border: 0px; /* 邊框 */
+        padding: 0px 10px; /* 內邊距 */
+        font-size: 1.5rem; /* 字體大小 */
+        border-radius: 50%; /* 使按鈕成為圓形 */
+    }
+    
+    .modal-dialog.custom-modal-size .close:hover {
+        background-color:  #dcdcdc; /* 滑鼠懸停時的灰色陰影 */      
+    }
+    
+    
+    /* 增加 'Show' 和下拉菜单之间的间距 */
+    .dataTables_length label {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .dataTables_length label > select {
+        margin-left: 15px;  /* 调整这个值以改变间距 */
+        margin-right: 15px; /* 调整这个值以改变间距 */
+    }
+
+
+    /* 针对 col-12 容器的样式，确保内容居中 */
+    .dataTables_wrapper .col-12 {
+        display: flex; 
+        justify-content: center;
+        margin-top: -5px;
+        margin-bottom: 20px;
+    }
+
+    .dataTable.fixedHeader-floating {
+        background-color: #b5e4f5;
+    }
