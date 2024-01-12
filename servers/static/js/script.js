@@ -322,7 +322,7 @@ function initializeDataTable() {
             "info": "Showing _START_ to _END_ of _TOTAL_ items"
         },
         "scrollX": true,
-        "scrollY": "500px",
+        "scrollY": "600px",
         "dom": 
             '<"top"Bf>' +
             'rt' +

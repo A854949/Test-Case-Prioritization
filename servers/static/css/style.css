@@ -12,23 +12,52 @@
         padding-bottom: 60px; /* 页脚高度的底部间距 */
     }    
 
-    .custom-background {
-        background-color: #f0f0f088; /* 设置背景颜色 */
-        padding: 25px; /* 调整内边距以增加大小 */
+    /* .custom-background {
+        background-color: #f0f0f088;
+        padding: 25px; 
         margin-top:20px;
         margin-bottom: 20px;
-    }
+    } */
 
+    label:not(:first-child) {
+        margin-top: 15px;
+    }
     
-    .custom-checkbox {
-        margin-top: 10px;
+    #custom-checkbox-container {
+        border-top: 1px solid rgb(209, 209, 209); /* 添加一條上邊框作為線 */
+        margin-top: 20px;
+        padding-top: 10px;
+        width: 100%; /* 設置寬度為100% */
+        box-sizing: border-box; /* 確保邊框被包含在寬度內 */
     }
-
-    .custom-checkbox .form-check-input {
-        width: 25px; /* 调整复选框的宽度 */
-        height: 25px; /* 调整复选框的高度 */
+    
+    #custom-checkbox-container.form-check-inline {
+        display: flex;
+        align-items: center; /* 確保標籤和復選框垂直居中對齊 */
+        gap: 10px; /* 如果需要，在標籤和復選框之間添加一些空間 */
     }
-
+    
+    #custom-checkbox-container label {
+        font-weight: bold;
+        font-size: 14px; /* 或者您希望的任何大小 */
+    }
+    
+    #highRiskCheckbox.form-check-input {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .center-container {
+        display: flex;
+        justify-content: center; /* 水平居中 */
+    }
+    
+    #clearAllButton {
+        background-color: #6bc8fdd4;
+        margin-top: 30px;
+        border-color: #80cffdd4#6bc8fdd4; /* 设置边框颜色 */
+    }
+    
 
     #outputTable_wrapper .dataTables_scrollBody{
         margin-bottom: 10px;
@@ -58,27 +87,7 @@
         background-color: #f0f0f0; /* 設置懸停時的背景顏色為灰色 */
     }
 
-    .form-group > label.form-check-label {
-        margin-right: 6px; /* 在"label"的右侧添加空格 */
-        margin-left: 20px; /* 在"label"的左侧添加空格 */
-        margin-top: 10px;
-    }
-
-    /* 设置选择框的宽度 */
-    #taskIdSelect, #projectSelect, #phaseSelect, #categorySelect, #caseTitleSelect {
-        width: 25%; /* 或者您可以使用百分比，例如 100% */
-    }
-
-    #caseTitleSelect {
-        width: 50%; /* 或者您可以使用百分比，例如 100% */
-    }
-
-    #clearAllButton {
-        background-color: #6bc8fdd4;
-        margin-left: 10px; /* 调整间隔 */
-        margin-top: 10px;
-        border-color: #80cffdd4#6bc8fdd4; /* 设置边框颜色 */
-    }
+    
    
     #clearAllButton:hover {
         background-color: #24bdf0; /* 鼠标悬停时的颜色 */
@@ -111,7 +120,7 @@
     }
 
     td.redirect-cell .clickable:hover {
-        color: #004b9b; /* 超連結的藍色 */
+        color: #0B0080; /* 超連結的藍色 */
     }
 
     .modal-dialog.custom-modal-size {
@@ -161,3 +170,32 @@
     .dataTable.fixedHeader-floating {
         background-color: #b5e4f5;
     }
+
+    .side-panel {
+        position: relative;
+        left: 0;
+        background-color: #f2f2f2;
+        padding: 20px;
+        height: 90%; /* 可根据需要进行调整，确保和主内容高度一致 */
+    }
+    
+    .side-panel select {
+        width: 100%; /* 讓<select>元素寬度佔滿父元素 */
+        max-width: 100%; /* 確保<select>元素不會超過其父元素的寬度 */
+        box-sizing: border-box; /* 確保邊框和內邊距不會讓元素寬度超出100% */
+    }
+
+    .filters-label-container {
+        margin-top: -20px;
+        text-align: center; /* 置中標籤 */
+    }
+
+    .filters-label {
+        font-weight: bold;
+        justify-content: center;
+    }
+    
+    .fas.fa-filter {
+        font-size: 15px; /* 調整圖標大小 */
+    }
+    
