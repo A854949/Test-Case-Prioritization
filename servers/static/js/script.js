@@ -323,14 +323,7 @@ function initializeDataTable() {
         },
         "scrollX": true,
         "scrollY": "500px",
-        "searchPanes": {
-            columns: [1,2,3],
-            layout: 'columns-2',
-            cascadePanes: true,
-            viewTotal: true,
-            },
         "dom": 
-            'P' +
             '<"top"Bf>' +
             'rt' +
             '<"bottom"<"row"<"col-md-10"i><"col-md-1"l>>>' +
