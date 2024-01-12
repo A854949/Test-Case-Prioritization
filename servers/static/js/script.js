@@ -166,11 +166,12 @@ function executeQuery() {
     // }
 
     // 不管表格是否已初始化，都需要重新设置列
-    selectedColumnsString = "`ID`, `Task ID`, `Case Title`, `Pass/Fail`, `Testing Site`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Category`, `Case Note`, `Comments`, `Component List`, `Comment`";
+    selectedColumnsString = "`Task ID`, `Case Title`, `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Category`, `Case Note`, `Comments`, `Component List`, `Comment`";
 
     // 构建 SQL 查询
     var sqlQuery = `SELECT ${selectedColumnsString} FROM abc
-    WHERE (\`Platform Name\` = '${project}' OR '${project}' = '')
+    WHERE (\`Task ID\` = '${taskId}' OR '${taskId}' = '')
+    AND (\`Platform Name\` = '${project}' OR '${project}' = '')
     AND (\`Case Title\` = '${caseTitle}' OR '${caseTitle}' = '')
     AND (\`HW Phase\` = '${phase}' OR '${phase}' = '')
     AND (\`Category\` REGEXP '^[[:space:]]*${category}[[:space:]]*$' OR '${category}' = '')`;
@@ -223,40 +224,59 @@ function initializeDataTable() {
         // }, 
         "processing" : true,
         "columns": [
-            { "data": 0, "width": "1%"}, // 對應 "ID"
-            { "data": 1, "width": "3%"}, // 對應 "Task ID"
-            { "data": 2, "width": "40%"}, // 對應 "Case Title"
-            { "data": 3, "width": "1%"}, // 對應 "Pass/Fail"
-            { "data": 4, "width": "1.7%"}, // 對應 "Testing Site"
-            { "data": 5, "width": "1%"}, // 對應 "Tester"
-            { "data": 6, "width": "1.2%"}, // 對應 "Platform Name"
-            { "data": 7, "width": "1.3%" }, // 對應 "SKU"
-            { "data": 8, "width": "1.5%" }, // 對應 "Hw Phase"
-            { "data": 9,
+            { "data": 0, "width": "3%"}, // 對應 "Task ID"
+            { "data": 1, "width": "40%"}, // 對應 "Case Title"
+            { "data": 2, "width": "1%"}, // 對應 "Pass/Fail"
+            { "data": 3, "width": "0.8%"}, // 對應 "Tester"
+            { "data": 4, "width": "1.5%"}, // 對應 "Platform Name"
+            { "data": 5, "width": "1.3%" }, // 對應 "SKU"
+            { "data": 6, "width": "1.5%" }, // 對應 "Hw Phase"
+            { "data": 7,
             "className": 'redirect-cell',
             "render": function(data, type, row) {
                 // 檢查數據是否為 null
                 if (data !== null && data !== '') {
-                    // 數據非 null，生成鏈接
-                    var url = 'https://si.austin.hp.com/si/Observations/Details.aspx?offset=8&ObservationId=' + data;
-                    return '<a href="' + url + '" class="clickable" target="_blank">' + data + '</a>';
-                } else {
-                    // 數據為 null，不生成鏈接
+                    // 检查数据中是否包含逗号
+                    if (data.includes(',')) {
+                        // 数据包含逗号，将数据分割成一个数组
+                        var dataArray = data.split(',');
+
+                        // 生成链接的HTML代码
+                        var linkHtml = '';
+                        for (var i = 0; i < dataArray.length; i++) {
+                        var sioNumber = dataArray[i].trim(); // 去除空格
+                        var url = 'https://si.austin.hp.com/si/Observations/Details.aspx?offset=8&ObservationId=' + sioNumber;
+                        linkHtml += '<a href="' + url + '" class="clickable" target="_blank">' + sioNumber + '</a>';
+
+                        // 如果不是最后一个元素，添加逗号分隔符
+                        if (i < dataArray.length - 1) {
+                            linkHtml += ', ';
+                        }
+                        }
+
+                        return linkHtml;
+                    } else {
+                        // 数据不包含逗号，直接生成链接
+                        var url = 'https://si.austin.hp.com/si/Observations/Details.aspx?offset=8&ObservationId=' + data;
+                        return '<a href="' + url + '" class="clickable" target="_blank">' + data + '</a>';
+                    }
+                    } else {
+                    // 数据为空，不生成链接
                     return data;
-                }
+                    }
             },
             "width": "0.8%"
             }, // 對應 "OBS"
-            { "data": 10, "width": "1%" }, // 對應 "Block Type"
-            { "data": 11, "width": "1.5%" }, // 對應 "File"
-            { "data": 12, "width": "1%" }, // 對應 "KAT/KUT"
-            { "data": 13, "width": "1%" }, // 對應 "RTA"
-            { "data": 14, "width": "1%" }, // 對應 "ATT/UAT"
-            { "data": 15, "width": "1%" }, // 對應 "Run Cycle"
-            { "data": 16, "width": "5%" }, // 對應 "Fail Cycle/Total Cycle"
-            { "data": 17, "width": "1%" }, // 對應 "Category"
-            { "data": 18, "width": "1%" }, // 對應 "Case Note"
-            { "data": 19,
+            { "data": 8, "width": "1%" }, // 對應 "Block Type"
+            { "data": 9, "width": "1.5%" }, // 對應 "File"
+            { "data": 10, "width": "1%" }, // 對應 "KAT/KUT"
+            { "data": 11, "width": "1%" }, // 對應 "RTA"
+            { "data": 12, "width": "1%" }, // 對應 "ATT/UAT"
+            { "data": 13, "width": "1%" }, // 對應 "Run Cycle"
+            { "data": 14, "width": "5%" }, // 對應 "Fail Cycle/Total Cycle"
+            { "data": 15, "width": "1%" }, // 對應 "Category"
+            { "data": 16, "width": "1%" }, // 對應 "Case Note"
+            { "data": 17,
             "className": 'ellipsis-cell', 
             "render": function(data, type, row) {
                 if (data !== null && data !== '') {
@@ -268,7 +288,7 @@ function initializeDataTable() {
                 }
             },
             "width": "2%"}, // 對應 "Comments"
-            { "data": 20,
+            { "data": 18,
             "className": 'ellipsis-cell', 
             "render": function(data, type, row) {
                 if (data !== null && data !== '') {
@@ -280,7 +300,7 @@ function initializeDataTable() {
                 }
             },
             "width": "2%"}, // 對應 "Component List"
-            { "data": 21,
+            { "data": 19,
             "className": 'ellipsis-cell',"render": function(data, type, row) {
                 if (data !== null && data !== '') {
                     // 數據非 null 或非空，添加 'has-data' 類
@@ -303,7 +323,14 @@ function initializeDataTable() {
         },
         "scrollX": true,
         "scrollY": "500px",
+        "searchPanes": {
+            columns: [1,2,3],
+            layout: 'columns-2',
+            cascadePanes: true,
+            viewTotal: true,
+            },
         "dom": 
+            'P' +
             '<"top"Bf>' +
             'rt' +
             '<"bottom"<"row"<"col-md-10"i><"col-md-1"l>>>' +
