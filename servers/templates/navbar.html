@@ -1,125 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+</head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <span class="menu-icon" style="font-size:25px;cursor:pointer" onclick="openNav()">&#9776;</span>
-                <a class="navbar-brand" href="/">
-                    <span style="display: flex; align-items: center;">
-                        <img src="/static/favicon.ico" height='22' alt="Favicon" class="favicon">
-                        <strong style="margin-left: 10px;">Test Case Prioritization</strong>
-                    </span>
-                </a>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-default">
+        <div class="container-md">
+            <a class="navbar-brand" href="/">
+                <img src="/static/favicon.ico" height='22' alt="Favicon" class="favicon">
+                <strong>Test Case Prioritization</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContents" aria-controls="navbarSupportedContents" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContents">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- 现有菜单项 -->
+                    <!-- 其他 <li> 项 -->
+    
+                    <!-- 新增的“任务报告”选项 -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="task_report">Task Report</a>
+                    </li>
+    
+                    <!-- 下拉式菜单 -->
+                    <!-- <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown link
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li> -->
+                </ul>
             </div>
         </div>
     </nav>
-    
 
-
-    <div id="sidebar" class="sidebar">
-        <a href="task_report">Task Report</a>
-        <!-- 更多链接 -->
-    </div>
-
-    <div id="main" class="main-content">
-        <!-- 原有的页面内容 -->
-    </div>
-
-    <script>
-        window.addEventListener('popstate', function(event) {
-            // 当用户点击后退按钮时，执行这里的代码
-            closeSidebar(); // 调用一个函数来关闭侧边栏
-        });
-
-        function closeSidebar() {
-            var sidebar = document.getElementById("sidebar");
-            var mainContent = document.getElementById("main");
-            sidebar.style.width = "0";
-            mainContent.style.marginLeft = "0";
-        }
-
-        // 确保 openNav 函数不会与 closeSidebar 冲突
-        function openNav() {
-            var sidebar = document.getElementById("sidebar");
-            var mainContent = document.getElementById("main");
-            if (sidebar.style.width === "250px") {
-                closeSidebar();
-            } else {
-                sidebar.style.width = "250px";
-                mainContent.style.marginLeft = "250px";
-            }
-        }
-            
-    </script>
-
-<style>
-    
-.navbar .container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0 15px;
-}
-
-    
-.navbar-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* 从左侧开始 */
-      
-    }
-    
-
-.menu-icon {
-    font-size: 25px;
-    cursor: pointer;
-    z-index: 1100;
-    color: #ffffff;
-    /* 移除绝对定位 */
-}
-
-    .main-content {
-        margin-left: 0; /* 初始状态下没有边距 */
-        transition: margin-left 0.5s; /* 平滑过渡效果 */
-        /* 其他必要样式 */
-        margin-bottom: 20px; 
-    }
-
-    .sidebar {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 1100;
-        top: 66px; /* 根据导航栏高度调整 */
-        left: 0;
-        background-color: #ffffff;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px; /* 根据需要调整 */
-    }
-
-        .sidebar a {
-            padding: 8px 8px 8px 32px;
-            text-decoration: none;
-            font-size: 16px;
-            color: #818181;
-            display: block;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            color: #f1f1f1;
-        }
-
-
-
-        @media screen and (max-height: 450px) {
-            .sidebar {padding-top: 15px;}
-            .sidebar a {font-size: 18px;}
-        }
-</style>
 
 </body>
 </html>
+
+<style>
+
+    .navbar-default, .navbar {
+        background-color: #0096D6;
+        border-color: #0293d1;
+        margin-bottom: 20px;
+    }
+
+    .favicon {
+        margin-top: -3px;
+        margin-right: 8px; /* 可以调整图标和品牌之间的水平间距 */
+    }
+
+    .navbar-default .navbar-brand,
+    .navbar-default .navbar-nav .nav-link {
+        color: #f3f1ea;
+    }
+
+    .navbar-default .navbar-nav .nav-link.active,
+    .navbar-default .navbar-nav .nav-link.active:focus,
+    .navbar-default .navbar-nav .nav-link.active:hover {
+        font-weight: bold;
+    }
+
+    .navbar-default .navbar-brand:focus,
+    .navbar-default .navbar-brand:hover,
+    .navbar-default .navbar-nav .nav-link:focus,
+    .navbar-default .navbar-nav .nav-link:hover {
+        color: #FFFFFF;
+        background-color: transparent;
+    }
+
+    /* Bootstrap 5 中的下拉菜单样式 */
+    .navbar-default .navbar-nav .dropdown-menu>.active, 
+    .navbar-default .navbar-nav .dropdown-menu>.active:focus, 
+    .navbar-default .navbar-nav .dropdown-menu>.active:hover {
+        color: #faf7f7;
+        background-color: #1c9ed6;
+    }
+
+</style>

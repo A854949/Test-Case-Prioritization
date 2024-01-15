@@ -24,6 +24,8 @@
     }
     
     #custom-checkbox-container {
+        display: flex;
+        align-items: center; /* 这会确保子元素在垂直方向上居中对齐 */
         border-top: 1px solid rgb(209, 209, 209); /* 添加一條上邊框作為線 */
         margin-top: 20px;
         padding-top: 10px;
@@ -43,6 +45,7 @@
     }
     
     #highRiskCheckbox.form-check-input {
+        margin-top: -1px;
         width: 20px;
         height: 20px;
     }
@@ -154,8 +157,8 @@
     }
 
     .dataTables_length label > select {
-        margin-left: 15px;  /* 调整这个值以改变间距 */
-        margin-right: 15px; /* 调整这个值以改变间距 */
+        margin-left: 8px;  /* 调整这个值以改变间距 */
+        margin-right: 8px; /* 调整这个值以改变间距 */
     }
 
 
@@ -197,5 +200,6 @@
     
     .fas.fa-filter {
         font-size: 15px; /* 調整圖標大小 */
+        margin-right: 5px;;
     }
     

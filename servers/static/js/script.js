@@ -225,11 +225,11 @@ function initializeDataTable() {
         "processing" : true,
         "columns": [
             { "data": 0, "width": "3%"}, // 對應 "Task ID"
-            { "data": 1, "width": "40%"}, // 對應 "Case Title"
+            { "data": 1, "width": "15%"}, // 對應 "Case Title"
             { "data": 2, "width": "1%"}, // 對應 "Pass/Fail"
             { "data": 3, "width": "0.8%"}, // 對應 "Tester"
             { "data": 4, "width": "1.5%"}, // 對應 "Platform Name"
-            { "data": 5, "width": "1.3%" }, // 對應 "SKU"
+            { "data": 5, "width": "1%" }, // 對應 "SKU"
             { "data": 6, "width": "1.5%" }, // 對應 "Hw Phase"
             { "data": 7,
             "className": 'redirect-cell',
@@ -443,4 +443,16 @@ $(document).ready(function() {
     
 });
 
+function loadNavbar() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById("navbar-placeholder").innerHTML = xhr.responseText;
+        }
+    };
+    xhr.open("GET", "navbar.html", true);
+    xhr.send();
+}
+
+window.onload = loadNavbar;
 
