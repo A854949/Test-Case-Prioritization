@@ -224,6 +224,13 @@ function initializeDataTable() {
         // }, 
         "processing" : true,
         "columns": [
+            {   // Checkbox select column
+                orderable: false,
+                targets: 0,
+                data: null,
+                defaultContent: '',
+                className: 'select-checkbox'      
+            },
             { "data": 0, "width": "3%"}, // 對應 "Task ID"
             { "data": 1, "width": "15%"}, // 對應 "Case Title"
             { "data": 2, "width": "1%"}, // 對應 "Pass/Fail"
@@ -312,6 +319,11 @@ function initializeDataTable() {
             },
             "width": "2%"}, // 對應 "Comment"
         ],
+        "select": {
+            style:    'multi',
+            selector: 'td.select-checkbox',
+        },
+        "order": [1, 'asc'],
         "paging": true, // 启用分页
         "pagingType": "simple_numbers",
         "info": true, // 显示页码信息
@@ -439,20 +451,4 @@ function clearAll() {
     executeQuery();
 }
 
-$(document).ready(function() {
-    
-});
-
-function loadNavbar() {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            document.getElementById("navbar-placeholder").innerHTML = xhr.responseText;
-        }
-    };
-    xhr.open("GET", "navbar.html", true);
-    xhr.send();
-}
-
-window.onload = loadNavbar;
 
