@@ -87,11 +87,30 @@
     }
     
     #outputTable tbody tr:hover {
-        background-color: #f0f0f0; /* 設置懸停時的背景顏色為灰色 */
+        background-color: #f6f6f6; /* 設置懸停時的背景顏色為灰色 */
     }
 
+    #outputTable th, #outputTable td {
+        white-space: nowrap;
+    }
+
+    #outputTable th.case-title-column, #outputTable td.case-title-column {
+        white-space: wrap;
+        width: 15%;
+    }
     
-   
+    .my-custom-checkbox {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        opacity: 0; /* 隐藏原生复选框 */
+        width: 0; /* 避免占用空间 */
+        height: 0; /* 避免占用空间 */
+        position: absolute; /* 脱离文档流 */
+    }
+
+
+    
     #clearAllButton:hover {
         background-color: #24bdf0; /* 鼠标悬停时的颜色 */
         border-color: #24bdf0; /* 鼠标悬停时的边框颜色 */
@@ -105,7 +124,7 @@
     }
 
     td.ellipsis-cell {
-        max-width: 100px;
+        max-width: 150px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -175,6 +194,7 @@
     }
 
 
+    
 
     .side-panel {
         position: relative;
@@ -205,3 +225,53 @@
         margin-right: 5px;;
     }
     
+    .custom-excel-button {
+        background-color: #5cb85c !important; /* 按钮背景色 */
+        color: white !important; /* 文字颜色 */
+        border: 1px solid #4cae4c !important; /* 边框颜色和宽度 */
+        border-radius: 3px !important; /* 圆角边框 */
+        padding: 5px 10px !important; /* 内边距 */
+        font-size: 14px !important; /* 字体大小 */
+        text-align: center !important; /* 文字居中 */
+        text-decoration: none !important; /* 去除下划线 */
+        display: inline-block !important; /* 行内块布局 */
+        margin: 4px 2px !important; /* 外边距 */
+        cursor: pointer !important; /* 鼠标手势 */
+        transition-duration: 0.4s !important; /* 过渡动画时长 */
+    }
+    
+    .custom-excel-button:hover {
+        background-color: #449d44 !important;
+    }
+    
+    .custom-colvis-button {
+        background-color: #337ab7 !important; /* 按钮背景色 */
+        color: white !important; /* 文字颜色 */
+        border: 1px solid #2e6da4 !important; /* 边框颜色和宽度 */
+        border-radius: 3px !important; /* 圆角边框 */
+        padding: 5px 10px !important; /* 内边距 */
+        font-size: 14px !important; /* 字体大小 */
+        text-align: center !important; /* 文字居中 */
+        text-decoration: none !important; /* 去除下划线 */
+        display: inline-block !important; /* 行内块布局 */
+        margin: 4px 2px !important; /* 外边距 */
+        cursor: pointer !important; /* 鼠标手势 */
+        transition-duration: 0.4s !important; /* 过渡动画时长 */
+    }
+
+    .custom-colvis-button:hover {
+        background-color: #286090 !important;
+    }
+
+    div.dt-button-collection.fixed.four-column {
+        width: 1000px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-20%, 0%);
+
+    }
+
+    .fas.fa-check-double, .fas.fa-eye-slash {
+        margin-right: 10px;
+    }

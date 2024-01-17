@@ -226,18 +226,19 @@ function initializeDataTable() {
         "columns": [
             {   // Checkbox select column
                 orderable: false,
+                className: 'select-checkbox noVis',
                 targets: 0,
-                data: null,
-                defaultContent: '',
-                className: 'select-checkbox'      
-            },
-            { "data": 0, "width": "3%"}, // 對應 "Task ID"
-            { "data": 1, "width": "15%"}, // 對應 "Case Title"
-            { "data": 2, "width": "1%"}, // 對應 "Pass/Fail"
-            { "data": 3, "width": "0.8%"}, // 對應 "Tester"
-            { "data": 4, "width": "1.5%"}, // 對應 "Platform Name"
-            { "data": 5, "width": "1%" }, // 對應 "SKU"
-            { "data": 6, "width": "1.5%" }, // 對應 "Hw Phase"
+                render: function (data, type, full, meta) {
+                    return '<input type="checkbox" class="my-custom-checkbox" />';
+                }
+            },     
+            { "data": 0}, // 對應 "Task ID"
+            { "data": 1, "className": "case-title-column"}, // 對應 "Case Title"
+            { "data": 2}, // 對應 "Pass/Fail"
+            { "data": 3}, // 對應 "Tester"
+            { "data": 4}, // 對應 "Platform Name"
+            { "data": 5}, // 對應 "SKU"
+            { "data": 6}, // 對應 "Hw Phase"
             { "data": 7,
             "className": 'redirect-cell',
             "render": function(data, type, row) {
@@ -274,15 +275,15 @@ function initializeDataTable() {
             },
             "width": "0.8%"
             }, // 對應 "OBS"
-            { "data": 8, "width": "1%" }, // 對應 "Block Type"
-            { "data": 9, "width": "1.5%" }, // 對應 "File"
-            { "data": 10, "width": "1%" }, // 對應 "KAT/KUT"
-            { "data": 11, "width": "1%" }, // 對應 "RTA"
-            { "data": 12, "width": "1%" }, // 對應 "ATT/UAT"
-            { "data": 13, "width": "1%" }, // 對應 "Run Cycle"
-            { "data": 14, "width": "5%" }, // 對應 "Fail Cycle/Total Cycle"
-            { "data": 15, "width": "1%" }, // 對應 "Category"
-            { "data": 16, "width": "1%" }, // 對應 "Case Note"
+            { "data": 8}, // 對應 "Block Type"
+            { "data": 9}, // 對應 "File"
+            { "data": 10}, // 對應 "KAT/KUT"
+            { "data": 11}, // 對應 "RTA"
+            { "data": 12}, // 對應 "ATT/UAT"
+            { "data": 13}, // 對應 "Run Cycle"
+            { "data": 14}, // 對應 "Fail Cycle/Total Cycle"
+            { "data": 15}, // 對應 "Category"
+            { "data": 16}, // 對應 "Case Note"
             { "data": 17,
             "className": 'ellipsis-cell', 
             "render": function(data, type, row) {
@@ -319,19 +320,28 @@ function initializeDataTable() {
             },
             "width": "2%"}, // 對應 "Comment"
         ],
+        'fixedColumns': {
+            left: 1
+        },
         "select": {
             style:    'multi',
             selector: 'td.select-checkbox',
         },
         "order": [1, 'asc'],
         "paging": true, // 启用分页
-        "pagingType": "simple_numbers",
+        "pagingType": "full_numbers",
         "info": true, // 显示页码信息
         "searching": true, // 启用搜索
         "ordering": true, // 启用排序
         "language": {
             "lengthMenu": "Show _MENU_ items",
-            "info": "Showing _START_ to _END_ of _TOTAL_ items"
+            "info": "Showing _START_ to _END_ of _TOTAL_ items",
+            "paginate": {
+                next: '<i class="fas fa-angle-right"></i>',
+                previous: '<i class="fas fa-angle-left"></i>',
+                first: '<i class="fas fa-angle-double-left"></i>',
+                last: '<i class="fas fa-angle-double-right"></i>'
+              }
         },
         "scrollX": true,
         "scrollY": "600px",
@@ -346,9 +356,25 @@ function initializeDataTable() {
                 extend: 'colvis',
                 text: 'Display Columns',
                 columns: ':not(.noVis)',
-                className: 'colvis-btn',
+                className: 'custom-colvis-button',
                 collectionLayout: 'fixed columns',
-                collectionTitle: 'Display Columns'
+                collectionLayout: "fixed four-column",
+                prefixButtons: [
+                {
+                    extend: "colvisGroup",
+                    text:
+                    '<span><i class="fas fa-check-double"></i></span>Show all',
+                    className: "show-all",
+                    show: ":hidden"
+                },
+                {
+                    extend: "colvisGroup",
+                    text:
+                    '<span><i class="fas fa-eye-slash"></i></span>Hide all',
+                    className: "hide-all",
+                    hide: ":visible"
+                }
+                ]          
             },
             {
                 extend: 'excelHtml5',
@@ -385,6 +411,7 @@ function initializeDataTable() {
         ],
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], // 指定每頁顯示數量的選項
         "pageLength": 10, // 初始的每頁顯示數量
+        "pageResize": true,
         "initComplete": function(settings, json) {
             // 應用保存的列設定
             this.api().columns().every(function(index) {
@@ -405,6 +432,7 @@ function initializeDataTable() {
             $('#exampleModal').modal('show');
         }
     }); 
+
 
     // $('#outputTable tbody').on('click', 'td.redirect-cell', function() {
     //     var cellData = $(this).text(); // 或者獲取單元格中的任何數據來決定網址

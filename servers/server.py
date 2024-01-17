@@ -107,6 +107,7 @@ def get_dropdown_data():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+
     
 @app.route('/task_report')  
 def task_report():
