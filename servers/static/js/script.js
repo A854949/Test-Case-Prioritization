@@ -1,4 +1,4 @@
-   // 全局变量
+// 全局变量
 var currentPage = 1;
 var resultsPerPage = 10; // DataTables将管理每页的结果数量
 var data; // 保存查询结果数据
@@ -328,11 +328,11 @@ function initializeDataTable() {
             selector: 'td.select-checkbox',
         },
         "order": [1, 'asc'],
-        "paging": true, // 启用分页
+        "paging": true, 
         "pagingType": "full_numbers",
-        "info": true, // 显示页码信息
-        "searching": true, // 启用搜索
-        "ordering": true, // 启用排序
+        "info": true, 
+        "searching": true, 
+        "ordering": true, 
         "language": {
             "lengthMenu": "Show _MENU_ items",
             "info": "Showing _START_ to _END_ of _TOTAL_ items",

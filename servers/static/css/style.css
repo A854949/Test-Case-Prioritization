@@ -12,12 +12,6 @@
         padding-bottom: 60px; /* 页脚高度的底部间距 */
     }    
 
-    /* .custom-background {
-        background-color: #f0f0f088;
-        padding: 25px; 
-        margin-top:20px;
-        margin-bottom: 20px;
-    } */
 
     label:not(:first-child) {
         margin-top: 15px;
@@ -42,6 +36,7 @@
     #custom-checkbox-container label {
         font-weight: bold;
         font-size: 14px; /* 或者您希望的任何大小 */
+        flex: 0 0 80%; /* 标签占据85%的宽度 */
     }
     
     #highRiskCheckbox.form-check-input {
@@ -58,7 +53,7 @@
     #clearAllButton {
         background-color: #6bc8fdd4;
         margin-top: 30px;
-        border-color: #80cffdd4#6bc8fdd4; /* 设置边框颜色 */
+        border-color: #80cffdd4; /* 设置边框颜色 */
     }
     
 
@@ -136,13 +131,14 @@
     }
 
     td.redirect-cell .clickable {
-        color: #007bff; /* 超連結的藍色 */
+        color: #5d90c0; /* 超連結的藍色 */
         text-decoration: none;
         cursor: pointer; /* 變更鼠標樣式為手指指標，表示可點擊 */
     }
 
     td.redirect-cell .clickable:hover {
-        color: #0B0080; /* 超連結的藍色 */
+        color: #245377; /* 超連結的藍色 */
+        text-decoration: underline; /* 添加下划线 */
     }
 
     .modal-dialog.custom-modal-size {

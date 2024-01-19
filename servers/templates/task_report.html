@@ -7,20 +7,33 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 
+        <!-- CSS -->
+        <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet">
 
-        <!-- 引入Bootstrap CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-        <!-- 引入jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- 引入Select2 CSS 和 JS -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-        <!-- 引入 Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-        <!-- DataTables CSS -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
-        <!-- DataTables JavaScript -->
-        <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>        
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>  
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
     </head>
 <body>
@@ -39,6 +52,7 @@
                         <th data-sortable="true">Start Date</th>
                         <th data-sortable="true">End Date</th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,13 +60,275 @@
                 </tbody>
             </table>
         </div>
-
-
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="addTaskReportBtn" class="btn btn-primary">Add Task Report</button>
+        </div>
+        
+        <!-- 模態彈窗結構 -->
+        <div id="taskReportModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <form id="taskReportForm" enctype="multipart/form-data"> <!-- 注意添加 enctype 属性 -->
+                    <label for="taskId">Task ID:</label>
+                    <input type="text" id="taskId" name="taskId"><br><br>
+        
+                    <label for="taskTitle">Task Title:</label>
+                    <input type="text" id="taskTitle" name="taskTitle"><br><br>
+        
+                    <label for="testingSite">Testing Site:</label>
+                    <input type="text" id="testingSite" name="testingSite"><br><br>
+        
+                    <label for="owner">Owner:</label>
+                    <input type="text" id="owner" name="owner"><br><br>
+        
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" name="startDate"><br><br>
+        
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" name="endDate"><br><br>
+        
+                    <label for="file">Upload File:</label> <!-- 添加文件上传字段 -->
+                    <input type="file" id="file" name="file"><br><br>
+        
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+        
     </div>
 
 <script>
 
+var table; // 全局变量定义
+
+function addRowToTable(taskData) {
+    console.log(taskData); // 打印以查看数据
+
+
+    var taskId = taskData.taskId || 'N/A'; // 如果data.taskId不存在，则显示'N/A'
+    var taskTitle = taskData.taskTitle || 'N/A';
+    var testingSite = taskData.testingSite || 'N/A';
+    var owner = taskData.owner || 'N/A';
+    var startDate = taskData.startDate || 'N/A';
+    var endDate = taskData.endDate || 'N/A';
+
+    table.row.add([
+        taskId,
+        taskTitle,
+        testingSite,
+        owner,
+        startDate,
+        endDate,
+        '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + taskId + '">Edit</button>',
+        '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + taskId + '">Delete</button>'
+    ]).draw(false); // 保持当前分页位置
+}
+
+$(document).ready(function() {
+    table = $('#outputTable').DataTable({
+        paging: true,
+        pagingType: "full_numbers",      
+        ordering: true,    
+        searching: true,   
+        info: true,       
+        order: [[0, 'asc']],
+        language: {
+            lengthMenu: "Show _MENU_ items",
+            info: "Showing _START_ to _END_ of _TOTAL_ items",
+            paginate: {
+                next: '<i class="fas fa-angle-right"></i>',
+                previous: '<i class="fas fa-angle-left"></i>',
+                first: '<i class="fas fa-angle-double-left"></i>',
+                last: '<i class="fas fa-angle-double-right"></i>'
+            }
+        }
+    });
+    console.log(table);
+
+    table.clear().draw();
+
+
+
+
+    // 在页面加载完毕后获取任务报告数据并添加到表格中
+    fetch('http://15.34.25.120:8080/get_task_reports')
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(taskData => addRowToTable(taskData));
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+
+});
+
+        document.getElementById('addTaskReportBtn').onclick = function() {
+        document.getElementById('taskReportModal').style.display = 'block';
+    };
+
+    // 獲取模態彈窗和關閉按鈕
+    var modal = document.getElementById('taskReportModal');
+    var span = document.getElementsByClassName("close")[0];
+
+    // 點擊 x 按鈕關閉模態彈窗
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // 點擊模態彈窗外部時關閉彈窗
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // 處理表單提交
+    document.getElementById('taskReportForm').onsubmit = function(e) {
+        e.preventDefault();
+
+        // 從表單獲取數據
+        var taskData = {
+            taskId: document.getElementById('taskId').value,
+            taskTitle: document.getElementById('taskTitle').value,
+            testingSite: document.getElementById('testingSite').value,
+            owner: document.getElementById('owner').value,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value
+        };
+
+
+    // 使用 fetch API 發送數據到後端
+    fetch('http://15.34.25.120:8080/task_report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.message) {
+            alert(data.message);
+            // 添加一行到表格
+            addRowToTable(taskData);
+            // 清空表單
+            document.getElementById('taskReportForm').reset();
+            // 關閉模態窗口
+            modal.style.display = "none";
+        } else if(data.error) {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch((error) => {
+        alert('Error: ' + error);
+    });
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('delete-btn')) {
+                var taskId = event.target.getAttribute('data-task-id');
+                deleteTask(taskId);
+            }
+        });
+    });
+
+
+function editTask(taskId) {
+    if (!taskId) {
+        console.error("Undefined taskId in editTask");
+        return;
+    }
+    // 获取模态框和表单元素
+    var modal = document.getElementById('taskReportModal');
+    var form = document.getElementById('taskReportForm');
+
+    // 假设您已经有了一个方法来根据 taskId 获取任务数据
+    var taskData = getTaskDataById(taskId);
+
+    // 填充表单数据
+    document.getElementById('taskId').value = taskData.taskId;
+    document.getElementById('taskTitle').value = taskData.taskTitle;
+    document.getElementById('testingSite').value = taskData.testingSite;
+    document.getElementById('owner').value = taskData.owner;
+    document.getElementById('startDate').value = taskData.startDate;
+    document.getElementById('endDate').value = taskData.endDate;
+
+    // 显示模态框
+    modal.style.display = 'block';
+}
+
+
+function deleteTask(taskId) {
+    if (!taskId) {
+        console.error("Undefined taskId in deleteTask");
+        return;
+    }
+    if(confirm('Are you sure you want to delete this item?')) {
+        fetch('http://15.34.25.120:8080/delete_task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ taskId: taskId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.message) {
+                alert(data.message);
+                // 从表格中移除任务行
+                removeTaskFromTable(taskId);
+            } else if(data.error) {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch((error) => {
+            alert('Error: ' + error);
+        });
+    }
+}
+
+function removeTaskFromTable(taskId) {
+    var table = $('#outputTable').DataTable();
+    table.rows().every(function(rowIdx, tableLoop, rowLoop) {
+        var data = this.data();
+        if (data[0] === taskId) { // 假設第一列是 taskId
+            this.remove();
+        }
+    }).draw();
+}
+
+
+
+document.getElementById('taskReportForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // 使用 FormData 包装表单数据
+    var formData = new FormData(this);
+
+    // 使用 fetch API 发送带有文件的数据到后端
+    fetch('http://15.34.25.120:8080/upload_and_process', {
+        method: 'POST',
+        body: formData  // 不需要设置 Content-Type 头，因为 FormData 会自动设置
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.message) {
+            alert(data.message);
+            // 可以在这里添加代码来处理服务器的响应
+        } else if(data.error) {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch((error) => {
+        alert('Error: ' + error);
+    });
+});
+
+
 </script>
+
 
 
 </body>
@@ -80,6 +356,40 @@
         background-color: #b5e4f5; /* 表头背景颜色 */
     }
 
+    /* 模態彈窗的基本樣式 */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 
 
 </style>
