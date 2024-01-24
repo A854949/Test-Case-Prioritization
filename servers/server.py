@@ -157,6 +157,7 @@ def get_task_reports():
         # 執行查詢以獲取所有任務報告
         cursor.execute('SELECT `Task ID`, `Task Title`, `Testing Site`, `Owner`, `Start Date`, `End Date` FROM taskReport')
         task_reports = cursor.fetchall()
+        
         # 將查詢結果轉換為字典列表
         tasks = []
         for report in task_reports:
@@ -223,12 +224,16 @@ def delete_task():
         task_id = data.get('taskId')
 
         # 构建 SQL 删除语句
-        delete_sql = "DELETE FROM taskReport WHERE `Task ID` = %s"
+        delete_task_report_sql = "DELETE FROM taskReport WHERE `Task ID` = %s"
+        delete_abc_records_sql = "DELETE FROM abc WHERE `Task ID` = %s"
+
 
         # 执行删除操作
         conn = pymysql.connect(**db_config)
         with conn.cursor() as cursor:
-            cursor.execute(delete_sql, (task_id,))
+            cursor.execute(delete_task_report_sql, (task_id,))
+            cursor.execute(delete_abc_records_sql, (task_id,))
+
             conn.commit()
 
         return jsonify({'message': 'Task deleted successfully'})

@@ -320,8 +320,10 @@ function initializeDataTable() {
             },
             "width": "2%"}, // 對應 "Comment"
         ],
-        'fixedColumns': {
-            left: 1
+        "searchPanes": {
+            show: true,
+            layout: 'columns-4',
+            targets: [0, 1, 2, 3, 4, 5]
         },
         "select": {
             style:    'multi',
@@ -346,6 +348,7 @@ function initializeDataTable() {
         "scrollX": true,
         "scrollY": "600px",
         "dom": 
+            
             '<"top"Bf>' +
             'rt' +
             '<"bottom"<"row"<"col-md-10"i><"col-md-1"l>>>' +
