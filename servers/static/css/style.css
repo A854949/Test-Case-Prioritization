@@ -197,7 +197,7 @@
         left: 0;
         background-color: #f2f2f2;
         padding: 20px;
-        height: 90%; /* 可根据需要进行调整，确保和主内容高度一致 */
+        height: 100%; /* 可根据需要进行调整，确保和主内容高度一致 */
     }
     
     .side-panel select {
