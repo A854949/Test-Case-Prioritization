@@ -199,8 +199,6 @@ function executeQuery() {
         }
         data = responseData.result; // 使用responseData的result属性
         totalRecords = data.length; // 设置totalRecords为数组长度
-        console.log("Total records:", totalRecords);
-        console.log("Data:", data); // 查看数据结构
         initializeDataTable(); // 确保数据加载后调用
     })
     .catch((error) => {
