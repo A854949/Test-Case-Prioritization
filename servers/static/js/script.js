@@ -221,6 +221,7 @@ function initializeDataTable() {
         //     headerOffset: -6
         // }, 
         "processing" : true,
+        
         "columns": [
             {   // Checkbox select column
                 orderable: false,
@@ -318,11 +319,24 @@ function initializeDataTable() {
             },
             "width": "2%"}, // 對應 "Comment"
         ],
-        "searchPanes": {
-            show: true,
-            layout: 'columns-4',
-            targets: [0, 1, 2, 3, 4, 5]
-        },
+        "columnDefs": [ // 添加 columnDefs 数组
+        // ...（这里可以放置其他的 columnDefs 配置）
+
+        { // 您提供的新配置
+            searchPanes: {
+                header: 'High Priority Test Cases',
+                options: [
+                    {
+                        label: 'Has OBS ID',
+                        value: function(rowData) {
+                            return rowData[7] != '';
+                        }
+                    }
+                ]
+            },
+            targets: [8]
+        }
+    ],
         "select": {
             style:    'multi',
             selector: 'td.select-checkbox',
@@ -345,9 +359,16 @@ function initializeDataTable() {
         },
         "scrollX": true,
         "scrollY": "600px",
+        "searchPanes": {
+            show: true,
+            cascadePanes: true,
+            orderable: false,
+            layout: 'columns-5',
+            columns: [1, 5, 7, 16, 8],          
+        },
         "dom": 
-            
-            '<"top"Bf>' +
+            '<"top"P>' +
+            '<Bf>' +
             'rt' +
             '<"bottom"<"row"<"col-md-10"i><"col-md-1"l>>>' +
             '<"row"<"col-12"p>>' +

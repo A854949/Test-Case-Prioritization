@@ -176,7 +176,13 @@ function initializeDataTable(taskData) {
                 first: '<i class="fas fa-angle-double-left"></i>',
                 last: '<i class="fas fa-angle-double-right"></i>'
             }
-        }
+        },
+        columnDefs: [
+            {
+                orderable: false,
+                targets: [6, 7]
+            }
+        ],
     });
     taskData.forEach(task => addRowToTable(task, table));
 }
