@@ -72,46 +72,46 @@ def execute_query():
     # from flask import Flask, send_file
 
 
-@app.route('/get-dropdown-data', methods=['GET'])
-def get_dropdown_data():
-    try:
-        conn = pymysql.connect(**db_config)
-        cursor = conn.cursor()
+# @app.route('/get-dropdown-data', methods=['GET'])
+# def get_dropdown_data():
+#     try:
+#         conn = pymysql.connect(**db_config)
+#         cursor = conn.cursor()
 
-        # 获取 Task ID 数据
-        cursor.execute('SELECT DISTINCT `Task ID` FROM abc ORDER BY `Task ID`')
-        task_id = [taskid[0] for taskid in cursor.fetchall()]
+#         # 获取 Task ID 数据
+#         cursor.execute('SELECT DISTINCT `Task ID` FROM abc ORDER BY `Task ID`')
+#         task_id = [taskid[0] for taskid in cursor.fetchall()]
 
-        # 获取 Platform Name 数据
-        cursor.execute('SELECT DISTINCT `Platform Name` FROM abc ORDER BY `Platform Name`')
-        platform_names = [name[0] for name in cursor.fetchall()]
+#         # 获取 Platform Name 数据
+#         cursor.execute('SELECT DISTINCT `Platform Name` FROM abc ORDER BY `Platform Name`')
+#         platform_names = [name[0] for name in cursor.fetchall()]
 
-        # 获取 HW Phase 数据
-        cursor.execute('SELECT DISTINCT `Hw Phase` FROM abc ORDER BY `Hw Phase`')
-        hw_phases = [phase[0] for phase in cursor.fetchall()]
+#         # 获取 HW Phase 数据
+#         cursor.execute('SELECT DISTINCT `Hw Phase` FROM abc ORDER BY `Hw Phase`')
+#         hw_phases = [phase[0] for phase in cursor.fetchall()]
 
-        # 获取 Category 数据
-        cursor.execute('SELECT DISTINCT `Category` FROM abc ORDER BY `Category`')
-        categories = [category[0] for category in cursor.fetchall()]
+#         # 获取 Category 数据
+#         cursor.execute('SELECT DISTINCT `Category` FROM abc ORDER BY `Category`')
+#         categories = [category[0] for category in cursor.fetchall()]
 
-        # 获取 Case Title 数据
-        cursor.execute('SELECT DISTINCT `Case Title` FROM abc ORDER BY `Case Title`')
-        case_titles = [title[0] for title in cursor.fetchall()]
+#         # 获取 Case Title 数据
+#         cursor.execute('SELECT DISTINCT `Case Title` FROM abc ORDER BY `Case Title`')
+#         case_titles = [title[0] for title in cursor.fetchall()]
 
 
-        cursor.close()
-        conn.close()
+#         cursor.close()
+#         conn.close()
 
-        return jsonify({
-            'taskIds': task_id,
-            'platformNames': platform_names,
-            'hwPhases': hw_phases,
-            'categories': categories,
-            'caseTitles': case_titles
-        })
+#         return jsonify({
+#             'taskIds': task_id,
+#             'platformNames': platform_names,
+#             'hwPhases': hw_phases,
+#             'categories': categories,
+#             'caseTitles': case_titles
+#         })
 
-    except Exception as e:
-        return jsonify({'error': str(e)})
+#     except Exception as e:
+#         return jsonify({'error': str(e)})
 
 @app.route('/task_report', methods=['GET', 'POST'])
 def task_report():

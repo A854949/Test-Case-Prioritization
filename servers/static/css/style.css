@@ -271,3 +271,100 @@
     .fas.fa-check-double, .fas.fa-eye-slash {
         margin-right: 10px;
     }
+
+    div.dtsp-verticalContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes,
+div.dtsp-verticalContainer div.container{
+    width: 12%;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 0;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes{
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 10%;
+}
+ 
+div.dtsp-verticalPanes {
+    margin-right: 20px;
+}
+ 
+div.dtsp-title {
+    margin-right: 0px !important;
+    margin-top: 13px !important;
+}
+ 
+input.dtsp-search {
+    min-width: 0px !important;
+    padding-left: 0px !important;
+    margin-left: 5px !important;
+    font-weight: bold;
+}
+
+div.dtsp-topRow div.dtsp-subRow1 div.dtsp-searchCont input.dtsp-disabledButton{
+    font-weight: bold;
+    color: black;
+}
+div.dtsp-verticalContainer div.dtsp-verticalPanes div.dtsp-searchPanes{
+    flex-direction: row;
+    flex-basis: 0px;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes div.dtsp-searchPanes div.dtsp-searchPane{
+    flex-basis: 0px;
+}
+ 
+div.dtsp-verticalContainer div.container{
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 62%;
+}
+ 
+div.dtsp-panesContainer {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f2f2f2;
+}
+
+div.dtsp-title {
+    margin-left: 10px;
+    margin-top: 0px !important;
+    font-weight: bold;
+}
+
+
+div.dtsp-topRow{
+    width: 100% !important;
+    box-sizing: border-box;
+    font-size: 1em;
+    white-space: nowrap;
+}
+
+
+div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody{
+    height: 100% !important;
+}
+
+div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody div.dtsp-nameCont span.dtsp-pill{
+    display: inline-block;
+    background-color: #b5e4f5 !important;
+    text-align: center;
+    border-radius: 4px;
+    width: auto;
+    min-width: 30px;
+    color: black;
+    font-size: .9em;
+    padding: 0px 6px !important;
+}
+
+
