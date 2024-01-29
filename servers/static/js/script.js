@@ -230,7 +230,7 @@ function initializeDataTable() {
             {   // Checkbox select column
                 orderable: false,
                 className: 'select-checkbox noVis',
-                targets: 0,
+                targets: -1,
                 render: function (data, type, full, meta) {
                     return '<input type="checkbox" class="my-custom-checkbox" />';
                 }

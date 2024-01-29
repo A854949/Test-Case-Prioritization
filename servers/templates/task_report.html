@@ -326,50 +326,50 @@ function editTask(taskId) {
 
     currentMode = 'edit';
     document.getElementById('taskId').disabled = true;
-    // 显示模态框
+    
     modal.style.display = 'block';
 }
 
 
-function deleteTask(taskId) {
-    if (!taskId) {
-        console.error("Undefined taskId in deleteTask");
-        return;
-    }
-    swal({
-        title: "Are you sure?",
-        text: "You will delete this record and all of the records of this Task ID!",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    })
-    .then((willDelete) => {
-        if (willDelete) {
-            fetch('http://15.34.25.120:8080/delete_task', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ taskId: taskId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.message) {
-                    swal("Task has been deleted!", {
-                        icon: "success",
-                    });
-                    // 从表格中移除任务行
-                    removeTaskFromTable(taskId);
-                } else if(data.error) {
-                    swal("Error!", data.error, "error");
-                }
-            })
-            .catch((error) => {
-                swal("Error!", error.toString(), "error");
-            });
-        }
-    });
-}
+// function deleteTask(taskId) {
+//     if (!taskId) {
+//         console.error("Undefined taskId in deleteTask");
+//         return;
+//     }
+//     swal({
+//         title: "Are you sure?",
+//         text: "You will delete this record and all of the records of this Task ID!",
+//         icon: "warning",
+//         buttons: true,
+//         dangerMode: true,
+//     })
+//     .then((willDelete) => {
+//         if (willDelete) {
+//             fetch('http://15.34.25.120:8080/delete_task', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: JSON.stringify({ taskId: taskId })
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//                 if(data.message) {
+//                     swal("Task has been deleted!", {
+//                         icon: "success",
+//                     });
+//                     // 从表格中移除任务行
+//                     removeTaskFromTable(taskId);
+//                 } else if(data.error) {
+//                     swal("Error!", data.error, "error");
+//                 }
+//             })
+//             .catch((error) => {
+//                 swal("Error!", error.toString(), "error");
+//             });
+//         }
+//     });
+// }
 
 function removeTaskFromTable(taskId) {
     var table = $('#outputTable').DataTable();
@@ -566,5 +566,8 @@ input.btn.btn-primary:hover {
         background-color:  #dcdcdc; /* 滑鼠懸停時的灰色陰影 */      
     }
 
+    .btn-danger:hover {
+        cursor: not-allowed;
+    }
 </style>
 
