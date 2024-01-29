@@ -367,4 +367,30 @@ div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody div.dtsp-na
     padding: 0px 6px !important;
 }
 
+div.dtsp-topRow div.dtsp-subRow1 input:focus {
+    outline: none !important;
+    box-sizing: border-box;
+    border: 2px solid #000000 !important;
+    margin-left: 0px !important;
+    background-color: #b5e4f5 !important;
+    border-radius: 4px;
+    cursor: text;
+}
 
+div.dtsp-topRow div.dtsp-subRow1 div.dtsp-searchCont input.dtsp-disabledButton:hover{
+    margin-left: -10px !important;
+    background-color: transparent !important;
+}
+
+div.dtsp-searchPane div.dtsp-topRow div.dtsp-searchCont input.dtsp-search {
+    margin-left: 5px ;
+    background-color: transparent ;
+}
+
+div.dtsp-topRow div.dtsp-subRow1 div.dtsp-searchCont input.dtsp-disabledButton:hover {
+    margin-left: 5px !important;
+}
+
+div.dtsp-topRow div.dtsp-subRow1 button.dtsp-searchIcon:hover {
+    background-color: transparent !important;
+}
