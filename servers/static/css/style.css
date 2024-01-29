@@ -8,8 +8,8 @@
     }
 
     .container {
-        min-height: calc(100% - 100px); /* 假设页脚高度为60px */
-        padding-bottom: 60px; /* 页脚高度的底部间距 */
+        min-height: calc(100% - 100px); 
+        padding-bottom: 60px; 
     }    
 
 

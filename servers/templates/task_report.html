@@ -423,11 +423,16 @@ document.getElementById('taskReportForm').addEventListener('submit', function(e)
 
 
 </body>
-<!-- 引入 footer.html -->
+
 {% include 'footer.html' %}
 </html>
 
 <style>
+
+.container {
+    min-height: calc(100% - 100px); 
+    padding-bottom: 60px; 
+}   
 
     #outputTable {
         width: 100%;

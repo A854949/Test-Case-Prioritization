@@ -68,9 +68,11 @@ def execute_query():
 
     except Exception as e:
         return jsonify({'error': str(e)})
-   
-    # from flask import Flask, send_file
-
+    
+@app.route('/login')
+def login():
+    return render_template('login.html')
+  
 
 # @app.route('/get-dropdown-data', methods=['GET'])
 # def get_dropdown_data():
@@ -241,37 +243,6 @@ def delete_task():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/get_task_data/<taskId>', methods=['GET'])
-def get_task_data(taskId):
-    try:
-        # 连接到数据库
-        conn = pymysql.connect(**db_config)
-        cursor = conn.cursor()
-
-        # 执行查询以获取特定任务的数据
-        cursor.execute('SELECT * FROM taskReport WHERE `Task ID` = %s', (taskId,))
-        task = cursor.fetchone()
-
-        if task is None:
-            return jsonify({'error': 'Task not found'}), 404
-
-        # 将任务数据转换成字典（或者其他您希望的格式）
-        task_data = {
-            'taskId': task[0],
-            'taskTitle': task[1],
-            'testingSite': task[2],
-            'owner': task[3],
-            'startDate': task[4],
-            'endDate': task[5]
-        }
-
-        cursor.close()
-        conn.close()
-
-        return jsonify(task_data)
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/upload_and_process', methods=['POST'])
 def upload_and_process():

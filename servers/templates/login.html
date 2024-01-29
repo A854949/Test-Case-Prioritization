@@ -1,0 +1,102 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Case Prioritization</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+        <!-- CSS -->
+        <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet">
+
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>        
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>  
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    </head>
+<body>
+
+    {% include 'navbar.html' %}
+
+<div class="container">
+    <div id="alertBox" class="alert alert-warning" role="alert" style="text-align: left;">
+        This page is currently down for maintenance.
+    </div>
+    
+    
+    <h1>Sign In</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <form action="" method="post" class="form" role="form">
+                <input id="csrf_token" name="csrf_token" type="hidden" value="IjM4ZTgyYjY1ODZlZjM3ZmI1NDdiZWM0MzI4MDIzYjkxZmQ4ZDMwZWIi.Zbc-BA.p8YSGKB13XPhGKpXkvvkSj9A_X8">
+            <div class="form-group  required"><label class="control-label" for="username">Username</label>
+                <input class="form-control" id="username" name="username" required type="text" value="">
+            </div>
+            <div class="form-group  required"><label class="control-label" for="password">Password</label>
+                <input class="form-control" id="password" name="password" required type="password" value="">
+            <br>
+            </div>  
+                <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Sign In">
+            </form>
+        </div>
+    </div>
+    <p>New User? <a href="#">Click to Register!</a></p>
+    <p>Forgot Your Password? <a href="#">Click to Reset It</a></p>
+</div>
+<br>
+
+</body>   
+
+{% include 'footer.html' %}
+
+</html>
+
+<script>
+    window.onload = function() {
+        setTimeout(function() {
+            document.getElementById('alertBox').style.display = 'none';
+        }, 4000);
+    };
+</script>
+
+
+<style>
+html {
+    min-height: 100%;
+    position: relative;
+}
+        
+body {
+    margin-bottom: 150px;
+}
+    
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+</style>
+        
