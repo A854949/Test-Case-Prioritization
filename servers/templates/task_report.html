@@ -127,33 +127,35 @@ var currentMode = 'add';
 var editingTaskId = null;
 
 $(document).ready(function() {
-    fetchAndUpdateTaskReports();
-
-});
-
-    function fetchAndUpdateTaskReports() {
     fetch('http://15.34.25.120:5010/get_task_reports')
-    .then(response => response.json())
+    
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(text => {
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('Failed to parse JSON:', text);
+            throw e;
+        }
+    })
     .then(data => {
-        // 将每个任务对象转换为数组，以匹配 DataTables 的期望格式
-        var formattedData = data.map(task => [
-            task.taskId || 'N/A',
-            task.taskTitle || 'N/A',
-            task.testingSite || 'N/A',
-            task.startDate || 'N/A',
-            task.endDate || 'N/A',
-            task.creator || 'N/A',
-            task.createdAt || 'N/A',
-            '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + (task.taskId || '') + '">Edit</button>',
-            '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + (task.taskId || '') + '">Delete</button>'
-        ]);
-
-        table.clear().rows.add(formattedData).draw();  // 清除并重新添加数据到 DataTable
+        initializeDataTable(data); 
+        if (Array.isArray(data) && data.length > 0) {
+            var taskId = data[0].taskId;
+        } else {
+            console.log('No taskId found.');
+        }
     })
     .catch((error) => {
-        console.error('Error fetching task reports:', error);
+        console.error(error);
     });
-}
+});
+
 function initializeDataTable(taskData) {
     table = $('#outputTable').DataTable({
         paging: true,
@@ -292,7 +294,29 @@ document.getElementById('addTaskReportBtn').onclick = function() {
         });
     });
 
+    function fetchAndUpdateTaskReports() {
+    fetch('http://15.34.25.120:5010/get_task_reports')
+    .then(response => response.json())
+    .then(data => {
+        // 将每个任务对象转换为数组，以匹配 DataTables 的期望格式
+        var formattedData = data.map(task => [
+            task.taskId || 'N/A',
+            task.taskTitle || 'N/A',
+            task.testingSite || 'N/A',
+            task.startDate || 'N/A',
+            task.endDate || 'N/A',
+            task.creator || 'N/A',
+            task.createdAt || 'N/A',
+            '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + (task.taskId || '') + '">Edit</button>',
+            '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + (task.taskId || '') + '">Delete</button>'
+        ]);
 
+        table.clear().rows.add(formattedData).draw();  // 清除并重新添加数据到 DataTable
+    })
+    .catch((error) => {
+        console.error('Error fetching task reports:', error);
+    });
+}
 
 
 function editTask(taskId) {
