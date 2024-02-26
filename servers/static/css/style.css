@@ -7,9 +7,10 @@
         margin-bottom: 150px;
     }
 
-    .container {
+    .container-fluid {
         min-height: calc(100% - 100px); 
-        padding-bottom: 60px; 
+        padding-bottom: 100px;
+        max-width: 90%; 
     }    
 
 
@@ -19,24 +20,24 @@
     
     #custom-checkbox-container {
         display: flex;
-        align-items: center; /* 这会确保子元素在垂直方向上居中对齐 */
-        border-top: 1px solid rgb(209, 209, 209); /* 添加一條上邊框作為線 */
+        align-items: center; 
+        border-top: 1px solid rgb(209, 209, 209); 
         margin-top: 20px;
         padding-top: 10px;
-        width: 100%; /* 設置寬度為100% */
-        box-sizing: border-box; /* 確保邊框被包含在寬度內 */
+        width: 100%;
+        box-sizing: border-box; 
     }
     
     #custom-checkbox-container.form-check-inline {
         display: flex;
-        align-items: center; /* 確保標籤和復選框垂直居中對齊 */
-        gap: 10px; /* 如果需要，在標籤和復選框之間添加一些空間 */
+        align-items: center; 
+        gap: 10px;
     }
     
     #custom-checkbox-container label {
         font-weight: bold;
-        font-size: 14px; /* 或者您希望的任何大小 */
-        flex: 0 0 80%; /* 标签占据85%的宽度 */
+        font-size: 14px; 
+        flex: 0 0 80%; 
     }
     
     #highRiskCheckbox.form-check-input {
@@ -47,13 +48,13 @@
     
     .center-container {
         display: flex;
-        justify-content: center; /* 水平居中 */
+        justify-content: center; 
     }
     
     #clearAllButton {
         background-color: #6bc8fdd4;
         margin-top: 30px;
-        border-color: #80cffdd4; /* 设置边框颜色 */
+        border-color: #80cffdd4;
     }
     
 
@@ -73,8 +74,8 @@
         right: 0;
         bottom: 0;
         width: 2px;
-        background-color: #888; /* 邊框顏色 */
-        box-shadow: 0 0 0 0 #888; /* 右側陰影 */
+        background-color: #888; 
+        box-shadow: 0 0 0 0 #888; 
     }
 
     #outputTable_wrapper .dataTables_scrollBody td {
@@ -82,7 +83,7 @@
     }
     
     #outputTable tbody tr:hover {
-        background-color: #f6f6f6; /* 設置懸停時的背景顏色為灰色 */
+        background-color: #f6f6f6; 
     }
 
     #outputTable th, #outputTable td {
@@ -98,17 +99,17 @@
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        opacity: 0; /* 隐藏原生复选框 */
-        width: 0; /* 避免占用空间 */
-        height: 0; /* 避免占用空间 */
-        position: absolute; /* 脱离文档流 */
+        opacity: 0; 
+        width: 0;
+        height: 0;
+        position: absolute;
     }
 
 
     
     #clearAllButton:hover {
-        background-color: #24bdf0; /* 鼠标悬停时的颜色 */
-        border-color: #24bdf0; /* 鼠标悬停时的边框颜色 */
+        background-color: #24bdf0; 
+        border-color: #24bdf0;
     }
 
     .toggle-button {
@@ -127,44 +128,42 @@
     }
 
     td.ellipsis-cell .has-data {
-        cursor: pointer; /* 只為有數據的單元格設定指針樣式 */
+        cursor: pointer; 
     }
 
     td.redirect-cell .clickable {
-        color: #5d90c0; /* 超連結的藍色 */
+        color: #5d90c0; 
         text-decoration: none;
-        cursor: pointer; /* 變更鼠標樣式為手指指標，表示可點擊 */
+        cursor: pointer;
     }
 
     td.redirect-cell .clickable:hover {
-        color: #245377; /* 超連結的藍色 */
-        text-decoration: underline; /* 添加下划线 */
+        color: #245377; 
+        text-decoration: underline;
     }
 
     .modal-dialog.custom-modal-size {
-        max-width: 800px; /* 或者你想要的任何寬度 */
-        margin: auto; /* 水平居中 */
-        display: flex; /* 使用 Flexbox */
-        align-items: center; /* 垂直居中 */
-        min-height: calc(100% - (.5rem * 2)); /* 最小高度，減去邊距 */
+        max-width: 800px; 
+        margin: auto; 
+        display: flex; 
+        align-items: center;
+        min-height: calc(100% - (.5rem * 2)); 
     }
 
     .modal-dialog.custom-modal-size .close {
         margin-left: auto;
-        color: #45454588; /* 設置文字顏色 */
-        background-color: white; /* 背景顏色 */
-        border: 0px; /* 邊框 */
-        padding: 0px 10px; /* 內邊距 */
-        font-size: 1.5rem; /* 字體大小 */
-        border-radius: 50%; /* 使按鈕成為圓形 */
+        color: #45454588; 
+        background-color: white;
+        border: 0px;
+        padding: 0px 10px; 
+        font-size: 1.5rem; 
+        border-radius: 50%;
     }
     
     .modal-dialog.custom-modal-size .close:hover {
-        background-color:  #dcdcdc; /* 滑鼠懸停時的灰色陰影 */      
+        background-color:  #dcdcdc;       
     }
     
-    
-    /* 增加 'Show' 和下拉菜单之间的间距 */
     .dataTables_length label {
         display: flex;
         align-items: center;
@@ -172,12 +171,11 @@
     }
 
     .dataTables_length label > select {
-        margin-left: 8px;  /* 调整这个值以改变间距 */
-        margin-right: 8px; /* 调整这个值以改变间距 */
+        margin-left: 8px;  
+        margin-right: 8px; 
     }
 
 
-    /* 针对 col-12 容器的样式，确保内容居中 */
     .dataTables_wrapper .col-12 {
         display: flex; 
         justify-content: center;
@@ -190,25 +188,23 @@
     }
 
 
-    
-
     .side-panel {
         position: relative;
         left: 0;
         background-color: #f2f2f2;
         padding: 20px;
-        height: 100%; /* 可根据需要进行调整，确保和主内容高度一致 */
+        height: 100%;
     }
     
     .side-panel select {
-        width: 100%; /* 讓<select>元素寬度佔滿父元素 */
-        max-width: 100%; /* 確保<select>元素不會超過其父元素的寬度 */
-        box-sizing: border-box; /* 確保邊框和內邊距不會讓元素寬度超出100% */
+        width: 100%; 
+        max-width: 100%;
+        box-sizing: border-box; 
     }
 
     .filters-label-container {
         margin-top: -20px;
-        text-align: center; /* 置中標籤 */
+        text-align: center; 
     }
 
     .filters-label {
@@ -217,23 +213,23 @@
     }
     
     .fas.fa-filter {
-        font-size: 15px; /* 調整圖標大小 */
+        font-size: 15px;
         margin-right: 5px;;
     }
     
     .custom-excel-button {
-        background-color: #5cb85c !important; /* 按钮背景色 */
-        color: white !important; /* 文字颜色 */
-        border: 1px solid #4cae4c !important; /* 边框颜色和宽度 */
-        border-radius: 3px !important; /* 圆角边框 */
-        padding: 5px 10px !important; /* 内边距 */
-        font-size: 14px !important; /* 字体大小 */
-        text-align: center !important; /* 文字居中 */
-        text-decoration: none !important; /* 去除下划线 */
-        display: inline-block !important; /* 行内块布局 */
-        margin: 4px 2px !important; /* 外边距 */
-        cursor: pointer !important; /* 鼠标手势 */
-        transition-duration: 0.4s !important; /* 过渡动画时长 */
+        background-color: #5cb85c !important;
+        color: white !important; 
+        border: 1px solid #4cae4c !important; 
+        border-radius: 3px !important;
+        padding: 5px 10px !important;
+        font-size: 14px !important; 
+        text-align: center !important;
+        text-decoration: none !important;
+        display: inline-block !important; 
+        margin: 4px 2px !important;
+        cursor: pointer !important;
+        transition-duration: 0.4s !important; 
     }
     
     .custom-excel-button:hover {
@@ -241,18 +237,18 @@
     }
     
     .custom-colvis-button {
-        background-color: #337ab7 !important; /* 按钮背景色 */
-        color: white !important; /* 文字颜色 */
-        border: 1px solid #2e6da4 !important; /* 边框颜色和宽度 */
-        border-radius: 3px !important; /* 圆角边框 */
-        padding: 5px 10px !important; /* 内边距 */
-        font-size: 14px !important; /* 字体大小 */
-        text-align: center !important; /* 文字居中 */
-        text-decoration: none !important; /* 去除下划线 */
-        display: inline-block !important; /* 行内块布局 */
-        margin: 4px 2px !important; /* 外边距 */
-        cursor: pointer !important; /* 鼠标手势 */
-        transition-duration: 0.4s !important; /* 过渡动画时长 */
+        background-color: #337ab7 !important; 
+        color: white !important; 
+        border: 1px solid #2e6da4 !important; 
+        border-radius: 3px !important; 
+        padding: 5px 10px !important;
+        font-size: 14px !important; 
+        text-align: center !important; 
+        text-decoration: none !important;
+        display: inline-block !important;
+        margin: 4px 2px !important;
+        cursor: pointer !important; 
+        transition-duration: 0.4s !important; 
     }
 
     .custom-colvis-button:hover {

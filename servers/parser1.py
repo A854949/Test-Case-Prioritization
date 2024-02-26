@@ -35,9 +35,27 @@ def process_dataframe(df, task_id=None):
 def process_and_ignore_np(df):
     """ 遍歷每一行，合併非 'NP' 值到 C 欄 """
     try:
+        new_rows = []
         for index, row in df.iterrows():
-            non_np_values = [str(val).strip() for col in df.columns[2:] for val in [row[col]] if 'NP_x000D_' not in str(val).strip()]
-            df.at[index, df.columns[2]] = ', '.join(non_np_values)
+            # 收集非 'NP' 的值
+            non_np_values = [str(row[col]).strip() for col in df.columns[2:] if 'NP_x000D_' not in str(row[col]).strip()]
+
+            # 檢查是否有多個非 'NP' 值
+            if len(non_np_values) > 1:
+                for val in non_np_values:
+                    new_row = row.copy()
+                    new_row[df.columns[2]] = val
+                    # 保持其他列不變
+                    for col in df.columns[3:]:
+                        new_row[col] = 'NP_x000D_'
+                    new_rows.append(new_row)
+            else:
+                df.at[index, df.columns[2]] = non_np_values[0] if non_np_values else 'NP_x000D_'
+
+        # 添加新行
+        for new_row in new_rows:
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+
         return df.iloc[:, :3]
     except Exception as e:
         print(f"Error: {e}")

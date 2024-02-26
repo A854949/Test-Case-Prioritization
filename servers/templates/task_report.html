@@ -37,7 +37,6 @@
 
     </head>
 <body>
-    <!-- 引入 navbar.html -->
     {% include 'navbar.html' %}
 
     <div class="container">
@@ -48,16 +47,17 @@
                         <th data-sortable="true">Task ID</th>
                         <th data-sortable="true">Task Title</th>
                         <th data-sortable="true">Testing Site</th>
-                        <th data-sortable="true">Owner</th>
                         <th data-sortable="true">Start Date</th>
                         <th data-sortable="true">End Date</th>
+                        <th data-sortable="true">Creator</th>
+                        <th data-sortable="true">Created at</th>
                         <th></th>
                             <button id="addTaskReportBtn" class="btn btn-primary">Add Task Report</button>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- 表身將在這裡動態添加 -->
+                    
                 </tbody>
             </table>
         </div>
@@ -71,7 +71,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="taskId" class="required-label"><strong>Task ID</strong></label>
-                            <input type="text" id="taskId" name="taskId" class="form-control" required pattern=".*\S+.*" title="This field is required">
+                            <input type="text" id="taskId" name="taskId" class="form-control" required pattern="[A-Za-z]{3}-TASK\d{10}" title="Task ID must be in the format of XXX-TASK0000000000.">
                         </div>
                         <div class="form-group">
                             <label for="taskTitle"><strong>Task Title</strong></label>
@@ -82,10 +82,6 @@
                         <div class="form-group">
                             <label for="testingSite"><strong>Testing Site</strong></label>
                             <input type="text" id="testingSite" name="testingSite" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="owner"><strong>Owner</strong></label>
-                            <input type="text" id="owner" name="owner" class="form-control">
                         </div>
                     </div>
                     <div class="form-row">
@@ -100,8 +96,13 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group full-width">
-                            <label for="file"><strong>Upload File</strong></label>
-                            <input type="file" id="file" name="file" class="form-control"d>
+                            <label for="file" class="required-label"><strong>Upload File</strong><samll> (Only "matrix" excel files are allowed.)</samll></label> 
+                            <input type="file" id="file" name="file" class="form-control"  required pattern=".*\S+.*"  title="This field is required">
+                            <small class="gray-background">You can follow these steps to download the file: <a href="https://novacq.scs.hpicorp.net/nova/Tasks" target="_blank">Nova</a>
+                            → Task Management → Task → Search task you want to import → Action column → Click Report button → Click Matrix button in the top right corner → Click Export button<br>
+                                <img src="/static/222740.png" width="500" height="45"><br>
+                                * Note: The current parser method may only correctly parse task reports for FXN and ICQ. Uploading other files may result in parsing errors.
+                            </small>                        
                         </div>
                     </div>
                     <div class="form-row submit-row">
@@ -121,55 +122,50 @@
 
 <script>
 
-var table; // 全局变量定义
-var currentMode = 'add'; // 可以是 'add' 或 'edit'
-
+var table;
+var currentMode = 'add'; 
+var editingTaskId = null;
 
 $(document).ready(function() {
-    // 在页面加载完毕后获取任务报告数据并添加到表格中
-    fetch('http://15.34.25.120:8080/get_task_reports')
-    
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text();
-    })
-    .then(text => {
-        try {
-            return JSON.parse(text);
-        } catch (e) {
-            console.error('Failed to parse JSON:', text);
-            throw e;
-        }
-    })
-    .then(data => {
-        initializeDataTable(data); // 初始化 DataTable
-        if (Array.isArray(data) && data.length > 0) {
-            var taskId = data[0].taskId;
-            // 这里可以使用 taskId 进行进一步操作
-            console.log('First taskId:', taskId);
-        } else {
-            // 处理数组为空或索引无效的情况
-            console.log('No taskId found.');
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+    fetchAndUpdateTaskReports();
+
 });
 
+    function fetchAndUpdateTaskReports() {
+    fetch('http://15.34.25.120:5010/get_task_reports')
+    .then(response => response.json())
+    .then(data => {
+        // 将每个任务对象转换为数组，以匹配 DataTables 的期望格式
+        var formattedData = data.map(task => [
+            task.taskId || 'N/A',
+            task.taskTitle || 'N/A',
+            task.testingSite || 'N/A',
+            task.startDate || 'N/A',
+            task.endDate || 'N/A',
+            task.creator || 'N/A',
+            task.createdAt || 'N/A',
+            '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + (task.taskId || '') + '">Edit</button>',
+            '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + (task.taskId || '') + '">Delete</button>'
+        ]);
+
+        table.clear().rows.add(formattedData).draw();  // 清除并重新添加数据到 DataTable
+    })
+    .catch((error) => {
+        console.error('Error fetching task reports:', error);
+    });
+}
 function initializeDataTable(taskData) {
     table = $('#outputTable').DataTable({
         paging: true,
         pagingType: "full_numbers",      
         ordering: true,    
         searching: true,   
-        info: true,       
+        info: true, 
+        lengthChange: false,
         order: [[0, 'asc']],
         language: {
             lengthMenu: "Show _MENU_ items",
-            info: "Showing _START_ to _END_ of _TOTAL_ items",
+            //info: "Showing _START_ to _END_ of _TOTAL_ items",
             paginate: {
                 next: '<i class="fas fa-angle-right"></i>',
                 previous: '<i class="fas fa-angle-left"></i>',
@@ -180,73 +176,83 @@ function initializeDataTable(taskData) {
         columnDefs: [
             {
                 orderable: false,
-                targets: [6, 7]
+                targets: [7, 8]
             }
         ],
+  
     });
     taskData.forEach(task => addRowToTable(task, table));
 }
 
 
 function addRowToTable(taskData) {
-    var taskId = taskData.taskId || 'N/A'; // 如果data.taskId不存在，则显示'N/A'
+    var taskId = taskData.taskId || 'N/A';
     var taskTitle = taskData.taskTitle || 'N/A';
     var testingSite = taskData.testingSite || 'N/A';
-    var owner = taskData.owner || 'N/A';
     var startDate = taskData.startDate || 'N/A';
     var endDate = taskData.endDate || 'N/A';
+    var creator = taskData.creator || 'N/A'; 
+    var createdAt = taskData.createdAt || 'N/A'; 
 
     table.row.add([
         taskId,
         taskTitle,
         testingSite,
-        owner,
         startDate,
         endDate,
+        creator,
+        createdAt,
         '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + taskId + '">Edit</button>',
         '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + taskId + '">Delete</button>'
-    ]).draw(false); // 保持当前分页位置
+    ]).draw(false); 
 }
 
-    document.getElementById('addTaskReportBtn').onclick = function() {
-        currentMode = 'add';
-        document.getElementById('taskId').disabled = false;
-        document.getElementById('taskReportModal').style.display = 'block';
-    };
+document.getElementById('addTaskReportBtn').onclick = function() {
+    currentMode = 'add';
+    document.getElementById('taskId').disabled = false;
+    document.getElementById('taskReportModal').style.display = 'block';
+};
 
-    // 獲取模態彈窗和關閉按鈕
     var modal = document.getElementById('taskReportModal');
     var span = document.getElementsByClassName("close")[0];
 
-    // 點擊 x 按鈕關閉模態彈窗
     span.onclick = function() {
         modal.style.display = "none";
     }
 
-    // 點擊模態彈窗外部時關閉彈窗
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     }
 
-    // 處理表單提交
     document.getElementById('taskReportForm').onsubmit = function(e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        // 從表單獲取數據
-        var taskData = {
-            taskId: document.getElementById('taskId').value,
-            taskTitle: document.getElementById('taskTitle').value,
-            testingSite: document.getElementById('testingSite').value,
-            owner: document.getElementById('owner').value,
-            startDate: document.getElementById('startDate').value,
-            endDate: document.getElementById('endDate').value
-        };
+    var fileInput = document.getElementById('file');
+    var file = fileInput.files[0];
+    if (file) {
+        var fileName = file.name;
+        var fileType = file.type;
 
+        if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(fileType) || !fileName.toLowerCase().startsWith('martrix')) {
+            alert('Only "matrix" Excel files are allowed.');
+            return;
+        }
+    } else {
+        alert('Please select a file.');
+        return;
+    }
 
-    // 使用 fetch API 發送數據到後端
-    fetch('http://15.34.25.120:8080/task_report', {
+    var taskData = {
+        taskId: document.getElementById('taskId').value,
+        taskTitle: document.getElementById('taskTitle').value,
+        testingSite: document.getElementById('testingSite').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value
+    };
+
+    fetch('http://15.34.25.120:5010/task_report', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -254,46 +260,28 @@ function addRowToTable(taskData) {
         body: JSON.stringify(taskData)
     })
     .then(response => {
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.text();
-    })
-    .then(text => {
-        console.log('Response text:', text); // 调试信息
-
-        if (text) {
-            try {
-                return JSON.parse(text);
-            } catch (error) {
-                console.error('Parsing error:', error);
-                // 如果解析失败，根据需要处理错误，例如返回默认值或错误对象
-                return null; // 或者其他默认值
-            }
-        } else {
-            // 如果响应为空，根据需要处理，例如返回默认值或错误对象
-            return null; // 或者其他默认值
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(errorData.error);
+            });
         }
+        return response.json();  // 获取 JSON 响应
     })
     .then(data => {
-        console.log('Parsed data:', data); // 调试信息
-
-        if(data.message) {
+        if (data.message) {
             alert(data.message);
-            // 添加一行到表格
-            addRowToTable(taskData);
-            // 清空表單
+            fetchAndUpdateTaskReports();  // 更新 DataTable
             document.getElementById('taskReportForm').reset();
-            // 關閉模態窗口
             modal.style.display = "none";
-        } else if(data.error) {
-            alert('Error: ' + data.error);
+        } else if (data.error) {
+            alert(data.error);
         }
     })
     .catch((error) => {
-        alert('Error: ' + error);
+        alert(error);
     });
-    };
+};
+
 
     document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('click', function(event) {
@@ -305,22 +293,20 @@ function addRowToTable(taskData) {
     });
 
 
+
+
 function editTask(taskId) {
     if (!taskId) {
         console.error("Undefined taskId in editTask");
         return;
     }
-    // 获取模态框和表单元素
+  
     var modal = document.getElementById('taskReportModal');
     var form = document.getElementById('taskReportForm');
-
-    // 假设您已经有了一个方法来根据 taskId 获取任务数据
     var taskData = getTaskDataById(taskId);
 
-    // 填充表单数据
     document.getElementById('taskTitle').value = taskData.taskTitle;
     document.getElementById('testingSite').value = taskData.testingSite;
-    document.getElementById('owner').value = taskData.owner;
     document.getElementById('startDate').value = taskData.startDate;
     document.getElementById('endDate').value = taskData.endDate;
 
@@ -331,92 +317,114 @@ function editTask(taskId) {
 }
 
 
-// function deleteTask(taskId) {
-//     if (!taskId) {
-//         console.error("Undefined taskId in deleteTask");
-//         return;
-//     }
-//     swal({
-//         title: "Are you sure?",
-//         text: "You will delete this record and all of the records of this Task ID!",
-//         icon: "warning",
-//         buttons: true,
-//         dangerMode: true,
-//     })
-//     .then((willDelete) => {
-//         if (willDelete) {
-//             fetch('http://15.34.25.120:8080/delete_task', {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json'
-//                 },
-//                 body: JSON.stringify({ taskId: taskId })
-//             })
-//             .then(response => response.json())
-//             .then(data => {
-//                 if(data.message) {
-//                     swal("Task has been deleted!", {
-//                         icon: "success",
-//                     });
-//                     // 从表格中移除任务行
-//                     removeTaskFromTable(taskId);
-//                 } else if(data.error) {
-//                     swal("Error!", data.error, "error");
-//                 }
-//             })
-//             .catch((error) => {
-//                 swal("Error!", error.toString(), "error");
-//             });
-//         }
-//     });
-// }
+function deleteTask(taskId) {
+    if (!taskId) {
+        console.error("Undefined taskId in deleteTask");
+        return;
+    }
+    swal({
+        title: "Are you sure?",
+        text: `You will delete this record and all of the records of ${taskId}!`,
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+            fetch('http://15.34.25.120:5010/delete_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ taskId: taskId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    swal("Deleted!", `${taskId} has been deleted successfully.`, "success");
+                    removeTaskFromTable(taskId);
+                } else if (data.error) {
+                    swal("Error!", data.error, "error");
+                }
+            })
+            .catch((error) => {
+                swal("Error!", error.toString(), "error");
+            });
+        }
+    });
+}
+
 
 function removeTaskFromTable(taskId) {
     var table = $('#outputTable').DataTable();
     table.rows().every(function(rowIdx, tableLoop, rowLoop) {
         var data = this.data();
-        if (data[0] === taskId) { // 假設第一列是 taskId
+        if (data && Array.isArray(data) && data.length > 0 && data[0] === taskId) {
             this.remove();
         }
     }).draw();
 }
 
+function getExistingTaskIds() {
+    var taskIds = [];
+    table.rows().data().each(function(value, index) {
+        taskIds.push(value[0]);
+    });
+    return taskIds;
+}
 
 
 document.getElementById('taskReportForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // 使用 FormData 包装表单数据
+    var inputTaskId = document.getElementById('taskId').value;
+    var fileInput = document.getElementById('file');
+    var file = fileInput.files[0];
+    var existingTaskIds = getExistingTaskIds();
+
+    if (existingTaskIds.includes(inputTaskId)) {
+        return;
+    }
+
+
+    var fileName = file.name;
+    var fileType = file.type;
+
+   
+    if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(fileType) || !fileName.toLowerCase().startsWith('martrix')) {
+        alert('Only "matrix" Excel files are allowed.');
+        return;
+    }
+
     var formData = new FormData(this);
 
-    // 使用 fetch API 发送带有文件的数据到后端
-    fetch('http://15.34.25.120:8080/upload_and_process', {
+
+    fetch('http://15.34.25.120:5010/upload_and_process', {
         method: 'POST',
-        body: formData  // 不需要设置 Content-Type 头，因为 FormData 会自动设置
+        body: formData
     })
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         if (response.status === 204) {
-            return null; // 如果状态码为 204，返回 null 以跳过 JSON 解析
+            return null; 
         }
-        return response.json(); // 否则解析 JSON
+        return response.json(); 
     })
     .then(data => {
         if (data) {
             if (data.message) {
                 alert(data.message);
             } else if (data.error) {
-                alert('Error: ' + data.error);
+                alert(data.error);
             }
         }
     })
     .catch((error) => {
-        alert('Error: ' + error);
+        alert(error);
     });
 });
-
 
 </script>
 
@@ -432,29 +440,31 @@ document.getElementById('taskReportForm').addEventListener('submit', function(e)
 .container {
     min-height: calc(100% - 100px); 
     padding-bottom: 60px; 
+    max-width: 90%; 
 }   
 
     #outputTable {
         width: 100%;
         overflow-x: auto;
-        border-collapse: collapse; /* 合并单元格边框 */
+        border-collapse: collapse;
+        margin-top: 20px !important;
     }
 
     #outputTable th,
     #outputTable td {
-        border: 1px solid #ddd; /* 定义单元格边框 */
-        padding: 8px; /* 添加内边距，使内容不会紧贴边框 */
-        text-align: left; /* 左对齐表格内容 */
+        border: 1px solid #ddd; 
+        padding: 8px;
+        text-align: left; 
         white-space: nowrap;
     }
 
 
     #outputTable th {
-        background-color: #b5e4f5; /* 表头背景颜色 */
+        background-color: #b5e4f5; 
     }
 
     #outputTable tbody tr:hover {
-        background-color: #f6f6f6; /* 設置懸停時的背景顏色為灰色 */
+        background-color: #f6f6f6;
     }
 
     .dataTables_length label {
@@ -464,15 +474,23 @@ document.getElementById('taskReportForm').addEventListener('submit', function(e)
     }
 
     .dataTables_length label > select {
-        margin-left: 8px;  /* 调整这个值以改变间距 */
-        margin-right: 8px; /* 调整这个值以改变间距 */
+        margin-left: 8px;  
+        margin-right: 8px; 
     }
 
     #addTaskReportBtn {
-        margin-bottom: 20px; /* 添加适当的边距 */
-        float: right; /* 如果需要，可以使按钮靠右对齐 */
+        position: relative;
+        margin-bottom: -35px;
+        float: left;
+        z-index: 1;
     }
 
+    div.dataTables_wrapper div.dataTables_filter label {
+        font-weight: normal;
+        white-space: nowrap;
+        text-align: left;
+        margin-bottom: 10px;
+    }
 
     .form-row {
     display: flex;
@@ -506,7 +524,7 @@ document.getElementById('taskReportForm').addEventListener('submit', function(e)
 }
 
 .submit-group {
-    flex: 0 0 auto; /* 自动调整宽度 */
+    flex: 0 0 auto; 
 }
 
 
@@ -529,49 +547,54 @@ input.btn.btn-primary:hover {
     background-color: #286090;
 }
 
-    /* 模態彈窗的基本樣式 */
+
 .modal {
     display: none;
-    position: relative;
+    position: fixed;
     z-index: 1;
-    left: 50%; /* 左边距为50% */
-    top: 20%; /* 顶部边距为50% */
-    transform: translate(-50%, -80%); /* 使用transform来确保模态框准确居中 */
-    overflow: auto;
-    justify-content: center;
-    align-items: center;
+    left: 0; 
+    top: 0;    
+    width: 100%; 
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 
-
-/* 模态框内容样式 */
 .modal-content {
-        background-color: #fefefe;
-        margin: auto; /* 自动边距以使其居中 */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 50%; /* 宽度为视窗宽度的50% */
-        max-width: 600px; /* 最大宽度限制 */
-    }
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; 
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
+    position: relative; 
+    top: 53%; 
+    transform: translateY(-47%);
+}
 
 
     .modal-content .close {
         margin-left: auto;
-        color: #45454588; /* 设置文字颜色 */
-        background-color: white; /* 背景颜色 */
-        border: 0; /* 边框 */
-        padding: 0 10px; /* 内边距 */
-        font-size: 1.5rem; /* 字体大小 */
-        border-radius: 50%; /* 使按钮成为圆形 */
-        cursor: pointer; /* 将鼠标样式改为指针，表示可以点击 */
+        color: #45454588; 
+        background-color: white; 
+        border: 0; 
+        padding: 0 10px; 
+        font-size: 1.5rem;
+        border-radius: 50%;
+        cursor: pointer; 
         
     }
 
     .modal-content .close:hover {
-        background-color:  #dcdcdc; /* 滑鼠懸停時的灰色陰影 */      
+        background-color:  #dcdcdc;     
     }
 
-    .btn-danger:hover {
+    .gray-background {
+        background-color: #f2f2f2; 
+        padding: 2px 5px; 
+        margin-top: 10px;
+    }
+    .btn-warning:hover {
         cursor: not-allowed;
     }
 </style>
