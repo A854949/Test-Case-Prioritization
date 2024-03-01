@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 
 def read_excel(file_path):
     """ 讀取 Excel 檔案 """
@@ -17,10 +16,10 @@ def process_dataframe(df, task_id=None):
         if task_id:
             original_header = df.columns[0]
             df.rename(columns={original_header: 'Task ID'}, inplace=True)
-            print("DataFrame after renaming:\n", df.head())  # 打印重命名后的 DataFrame
+            print("DataFrame after renaming:\n", df.head())  
 
             df = df[df['Task ID'] == task_id]
-            print("DataFrame after filtering by task_id:\n", df.head())  # 打印过滤后的 DataFrame
+            print("DataFrame after filtering by task_id:\n", df.head()) 
             df.loc[:, 'Task ID'] = original_header
             df = df.drop(columns=['Unnamed: 2'])
 
@@ -37,22 +36,18 @@ def process_and_ignore_np(df):
     try:
         new_rows = []
         for index, row in df.iterrows():
-            # 收集非 'NP' 的值
             non_np_values = [str(row[col]).strip() for col in df.columns[2:] if 'NP_x000D_' not in str(row[col]).strip()]
 
-            # 檢查是否有多個非 'NP' 值
             if len(non_np_values) > 1:
                 for val in non_np_values:
                     new_row = row.copy()
                     new_row[df.columns[2]] = val
-                    # 保持其他列不變
                     for col in df.columns[3:]:
                         new_row[col] = 'NP_x000D_'
                     new_rows.append(new_row)
             else:
                 df.at[index, df.columns[2]] = non_np_values[0] if non_np_values else 'NP_x000D_'
 
-        # 添加新行
         for new_row in new_rows:
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
 

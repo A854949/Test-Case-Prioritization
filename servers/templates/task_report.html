@@ -8,7 +8,6 @@
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 
         <!-- CSS -->
-        <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
         <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
@@ -49,8 +48,8 @@
                         <th data-sortable="true">Testing Site</th>
                         <th data-sortable="true">Start Date</th>
                         <th data-sortable="true">End Date</th>
-                        <th data-sortable="true">Creator</th>
-                        <th data-sortable="true">Created at</th>
+                        <th data-sortable="true">Uploaded by</th>
+                        <th data-sortable="true">Uploaded at</th>
                         <th></th>
                             <button id="addTaskReportBtn" class="btn btn-primary">Add Task Report</button>
                         <th></th>
@@ -112,131 +111,209 @@
                     </div>
                 </form>
             </div>
-        </div>
-        
-                            
-            </div>
-        </div>
-        
+        </div>     
     </div>
 
-<script>
+    <script>
 
-var table;
-var currentMode = 'add'; 
-var editingTaskId = null;
-
-$(document).ready(function() {
-    fetch('http://15.34.25.120:5010/get_task_reports')
-    
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        var table;
+        var currentMode = 'add';
+        
+        $(document).ready(function() {
+            fetchTaskReports();
+        });
+        
+        function fetchTaskReports() {
+            fetch('http://15.34.25.120:5010/get_task_reports')
+            .then(response => response.json())
+            .then(data => {
+                if (!table) {
+                    initializeDataTable(data);
+                } else {
+                    updateDataTable(data);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
         }
-        return response.text();
-    })
-    .then(text => {
-        try {
-            return JSON.parse(text);
-        } catch (e) {
-            console.error('Failed to parse JSON:', text);
-            throw e;
+        
+        function initializeDataTable(taskData) {
+            table = $('#outputTable').DataTable({
+                paging: true,
+                pagingType: "full_numbers",
+                ordering: true,
+                searching: true,
+                info: true,
+                lengthChange: false,
+                order: [[0, 'asc']],
+                language: {
+                    lengthMenu: "Show _MENU_ items",
+                    paginate: {
+                        next: '<i class="fas fa-angle-right"></i>',
+                        previous: '<i class="fas fa-angle-left"></i>',
+                        first: '<i class="fas fa-angle-double-left"></i>',
+                        last: '<i class="fas fa-angle-double-right"></i>'
+                    }
+                },
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets: [7, 8]
+                    }
+                ],
+            });
+            updateDataTable(taskData);
         }
-    })
-    .then(data => {
-        initializeDataTable(data); 
-        if (Array.isArray(data) && data.length > 0) {
-            var taskId = data[0].taskId;
-        } else {
-            console.log('No taskId found.');
+        
+        function updateDataTable(taskData) {
+            var formattedData = taskData.map(task => [
+                task.taskId || 'N/A',
+                task.taskTitle || 'N/A',
+                task.testingSite || 'N/A',
+                task.startDate || 'N/A',
+                task.endDate || 'N/A',
+                task.creator || 'N/A',
+                task.createdAt || 'N/A',
+                '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + (task.taskId || '') + '">Upload</button>',
+                '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + (task.taskId || '') + '">Delete</button>'
+            ]);
+            table.clear().rows.add(formattedData).draw();
         }
-    })
-    .catch((error) => {
-        console.error(error);
-    });
-});
-
-function initializeDataTable(taskData) {
-    table = $('#outputTable').DataTable({
-        paging: true,
-        pagingType: "full_numbers",      
-        ordering: true,    
-        searching: true,   
-        info: true, 
-        lengthChange: false,
-        order: [[0, 'asc']],
-        language: {
-            lengthMenu: "Show _MENU_ items",
-            //info: "Showing _START_ to _END_ of _TOTAL_ items",
-            paginate: {
-                next: '<i class="fas fa-angle-right"></i>',
-                previous: '<i class="fas fa-angle-left"></i>',
-                first: '<i class="fas fa-angle-double-left"></i>',
-                last: '<i class="fas fa-angle-double-right"></i>'
-            }
-        },
-        columnDefs: [
-            {
-                orderable: false,
-                targets: [7, 8]
-            }
-        ],
-  
-    });
-    taskData.forEach(task => addRowToTable(task, table));
-}
-
-
-function addRowToTable(taskData) {
-    var taskId = taskData.taskId || 'N/A';
-    var taskTitle = taskData.taskTitle || 'N/A';
-    var testingSite = taskData.testingSite || 'N/A';
-    var startDate = taskData.startDate || 'N/A';
-    var endDate = taskData.endDate || 'N/A';
-    var creator = taskData.creator || 'N/A'; 
-    var createdAt = taskData.createdAt || 'N/A'; 
-
-    table.row.add([
-        taskId,
-        taskTitle,
-        testingSite,
-        startDate,
-        endDate,
-        creator,
-        createdAt,
-        '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + taskId + '">Edit</button>',
-        '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + taskId + '">Delete</button>'
-    ]).draw(false); 
-}
-
-document.getElementById('addTaskReportBtn').onclick = function() {
-    currentMode = 'add';
-    document.getElementById('taskId').disabled = false;
-    document.getElementById('taskReportModal').style.display = 'block';
-};
-
-    var modal = document.getElementById('taskReportModal');
-    var span = document.getElementsByClassName("close")[0];
-
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
+        
+        document.getElementById('addTaskReportBtn').onclick = function() {
+            currentMode = 'add';
+            document.getElementById('taskId').disabled = false;
+            document.getElementById('taskReportModal').style.display = 'block';
+        };
+        
+        var modal = document.getElementById('taskReportModal');
+        var span = document.getElementsByClassName("close")[0];
+        
+        span.onclick = function() {
             modal.style.display = "none";
         }
-    }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        
+        document.getElementById('taskReportForm').onsubmit = function(e) {
+            e.preventDefault();
+        
+            var taskData = {
+                taskId: document.getElementById('taskId').value,
+                taskTitle: document.getElementById('taskTitle').value,
+                testingSite: document.getElementById('testingSite').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value
+            };
+        
+            var url = currentMode === 'add' ? 'http://15.34.25.120:5010/task_report' : 'http://15.34.25.120:5010/edit_task';
+        var method = 'POST';
 
-    document.getElementById('taskReportForm').onsubmit = function(e) {
+        if (currentMode === 'edit') {
+            taskData.taskId = document.getElementById('taskId').value;
+        }
+
+        fetch(url, {
+    method: method,
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(taskData)
+})
+.then(response => {
+    if (response.headers.get('Content-Type').includes('application/json')) {
+        return response.json();
+    } else {
+        throw new Error('收到非 JSON 回應');
+    }
+})
+.then(data => {
+    if (data.message) {
+        alert(data.message);
+        fetchTaskReports();
+        document.getElementById('taskReportForm').reset();
+        modal.style.display = "none";
+    } else if (data.error) {
+        alert(data.error);
+    }
+})
+.catch((error) => {
+    alert(error);
+});
+
+    };
+        
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('edit-btn')) {
+                var taskId = event.target.getAttribute('data-task-id');
+                editTask(taskId);
+            }
+            if (event.target.classList.contains('delete-btn')) {
+                var taskId = event.target.getAttribute('data-task-id');
+                deleteTask(taskId);
+            }
+        });
+        function editTask(taskId) {
+        var taskData = table.rows().data().filter(row => row[0] === taskId)[0];
+        if (taskData) {
+            document.getElementById('taskId').value = taskData[0];
+            document.getElementById('taskTitle').value = taskData[1];
+            document.getElementById('testingSite').value = taskData[2];
+            document.getElementById('startDate').value = taskData[3];
+            document.getElementById('endDate').value = taskData[4];
+            document.getElementById('taskId').disabled = true;
+            currentMode = 'edit';
+            modal.style.display = 'block';
+        }
+    }
+        function deleteTask(taskId) {
+            swal({
+                title: "Are you sure?",
+                text: `You will delete this record and all of the records of ${taskId}!`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    fetch('http://15.34.25.120:5010/delete_task', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ taskId: taskId }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            swal("Deleted!", `${taskId} has been deleted successfully.`, "success");
+                            fetchTaskReports();
+                        } else if (data.error) {
+                            swal("Error!", data.error, "error");
+                        }
+                    })
+                    .catch((error) => {
+                        swal("Error!", error.toString(), "error");
+                    });
+                }
+            });
+        }
+        
+    document.getElementById('taskReportForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    var taskId = document.getElementById('taskId').value;
     var fileInput = document.getElementById('file');
     var file = fileInput.files[0];
+
     if (file) {
         var fileName = file.name;
         var fileType = file.type;
-
         if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(fileType) || !fileName.toLowerCase().startsWith('martrix')) {
             alert('Only "matrix" Excel files are allowed.');
             return;
@@ -246,33 +323,47 @@ document.getElementById('addTaskReportBtn').onclick = function() {
         return;
     }
 
-    var taskData = {
-        taskId: document.getElementById('taskId').value,
-        taskTitle: document.getElementById('taskTitle').value,
-        testingSite: document.getElementById('testingSite').value,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value
-    };
+    var formData = new FormData(this);
 
-    fetch('http://15.34.25.120:5010/task_report', {
+    if (currentMode === 'edit') {
+        fetch('http://15.34.25.120:5010/delete_task_unverified', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ taskId: taskId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                uploadFile(formData);
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch((error) => {
+            alert(error);
+        });
+    } else {
+        uploadFile(formData);
+    }
+});
+
+function uploadFile(formData) {
+    fetch('http://15.34.25.120:5010/upload_and_process', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(taskData)
+        body: formData
     })
     .then(response => {
         if (!response.ok) {
-            return response.json().then(errorData => {
-                throw new Error(errorData.error);
-            });
+            throw new Error('Network response was not ok');
         }
-        return response.json();  // 获取 JSON 响应
+        return response.json();
     })
     .then(data => {
         if (data.message) {
             alert(data.message);
-            fetchAndUpdateTaskReports();  // 更新 DataTable
+            fetchTaskReports();
             document.getElementById('taskReportForm').reset();
             modal.style.display = "none";
         } else if (data.error) {
@@ -282,175 +373,19 @@ document.getElementById('addTaskReportBtn').onclick = function() {
     .catch((error) => {
         alert(error);
     });
-};
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('delete-btn')) {
-                var taskId = event.target.getAttribute('data-task-id');
-                deleteTask(taskId);
-            }
-        });
-    });
-
-    function fetchAndUpdateTaskReports() {
-    fetch('http://15.34.25.120:5010/get_task_reports')
-    .then(response => response.json())
-    .then(data => {
-        // 将每个任务对象转换为数组，以匹配 DataTables 的期望格式
-        var formattedData = data.map(task => [
-            task.taskId || 'N/A',
-            task.taskTitle || 'N/A',
-            task.testingSite || 'N/A',
-            task.startDate || 'N/A',
-            task.endDate || 'N/A',
-            task.creator || 'N/A',
-            task.createdAt || 'N/A',
-            '<button class="btn btn-warning btn-sm edit-btn" data-task-id="' + (task.taskId || '') + '">Edit</button>',
-            '<button class="btn btn-danger btn-sm delete-btn" data-task-id="' + (task.taskId || '') + '">Delete</button>'
-        ]);
-
-        table.clear().rows.add(formattedData).draw();  // 清除并重新添加数据到 DataTable
-    })
-    .catch((error) => {
-        console.error('Error fetching task reports:', error);
-    });
 }
 
-
-function editTask(taskId) {
-    if (!taskId) {
-        console.error("Undefined taskId in editTask");
-        return;
-    }
-  
-    var modal = document.getElementById('taskReportModal');
-    var form = document.getElementById('taskReportForm');
-    var taskData = getTaskDataById(taskId);
-
-    document.getElementById('taskTitle').value = taskData.taskTitle;
-    document.getElementById('testingSite').value = taskData.testingSite;
-    document.getElementById('startDate').value = taskData.startDate;
-    document.getElementById('endDate').value = taskData.endDate;
-
-    currentMode = 'edit';
-    document.getElementById('taskId').disabled = true;
-    
-    modal.style.display = 'block';
-}
-
-
-function deleteTask(taskId) {
-    if (!taskId) {
-        console.error("Undefined taskId in deleteTask");
-        return;
-    }
-    swal({
-        title: "Are you sure?",
-        text: `You will delete this record and all of the records of ${taskId}!`,
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    })
-    .then((willDelete) => {
-        if (willDelete) {
-            fetch('http://15.34.25.120:5010/delete_task', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ taskId: taskId }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    swal("Deleted!", `${taskId} has been deleted successfully.`, "success");
-                    removeTaskFromTable(taskId);
-                } else if (data.error) {
-                    swal("Error!", data.error, "error");
-                }
-            })
-            .catch((error) => {
-                swal("Error!", error.toString(), "error");
+        
+        function taskIdExists(taskId) {
+            var existingTaskIds = [];
+            table.rows().data().each(function(value, index) {
+                existingTaskIds.push(value[0]);
             });
+            return existingTaskIds.includes(taskId);
         }
-    });
-}
-
-
-function removeTaskFromTable(taskId) {
-    var table = $('#outputTable').DataTable();
-    table.rows().every(function(rowIdx, tableLoop, rowLoop) {
-        var data = this.data();
-        if (data && Array.isArray(data) && data.length > 0 && data[0] === taskId) {
-            this.remove();
-        }
-    }).draw();
-}
-
-function getExistingTaskIds() {
-    var taskIds = [];
-    table.rows().data().each(function(value, index) {
-        taskIds.push(value[0]);
-    });
-    return taskIds;
-}
-
-
-document.getElementById('taskReportForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    var inputTaskId = document.getElementById('taskId').value;
-    var fileInput = document.getElementById('file');
-    var file = fileInput.files[0];
-    var existingTaskIds = getExistingTaskIds();
-
-    if (existingTaskIds.includes(inputTaskId)) {
-        return;
-    }
-
-
-    var fileName = file.name;
-    var fileType = file.type;
-
-   
-    if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(fileType) || !fileName.toLowerCase().startsWith('martrix')) {
-        alert('Only "matrix" Excel files are allowed.');
-        return;
-    }
-
-    var formData = new FormData(this);
-
-
-    fetch('http://15.34.25.120:5010/upload_and_process', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        if (response.status === 204) {
-            return null; 
-        }
-        return response.json(); 
-    })
-    .then(data => {
-        if (data) {
-            if (data.message) {
-                alert(data.message);
-            } else if (data.error) {
-                alert(data.error);
-            }
-        }
-    })
-    .catch((error) => {
-        alert(error);
-    });
-});
-
-</script>
+        
+        </script>
+        
 
 
 
@@ -618,8 +553,6 @@ input.btn.btn-primary:hover {
         padding: 2px 5px; 
         margin-top: 10px;
     }
-    .btn-warning:hover {
-        cursor: not-allowed;
-    }
+
 </style>
 
