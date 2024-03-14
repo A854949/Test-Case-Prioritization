@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Case Prioritization</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+        <!-- CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet">
+
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>        
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>  
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    </head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <table id="outputTable">
+            <thead>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Task Title</th>
+                    <th>Testing Site</th>
+                    <th>Owner</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <button id="compareBtn" class="btn btn-primary">Compare</button>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row['Task ID'] or 'N/A' }}</td>
+                    <td>{{ row['Task Title'] or 'N/A' }}</td>
+                    <td>{{ row['Testing Site'] or 'N/A' }}</td>
+                    <td>{{ row['Owner'] or 'N/A' }}</td>
+                    <td>{{ row['Start Date'] or 'N/A' }}</td>
+                    <td>{{ row['End Date'] or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+        <div class="modal-dialog custom-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="compareModalLabel"><b>Choose Task ID and Case Title to compare</h3></b>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="configContainer">
+                        <!-- Config rows will be added here dynamically -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" id="addConfig">Add More</button>
+                    <button type="button" class="btn btn-success" id="clearAllBtn">Clear All</button>
+                </div>
+                <div class="modal-footer">
+                    <table class="table" id="detailsTable">
+                        <tbody>
+
+                            <tr><th>Pass/Fail</th><td></td></tr>
+                            <tr><th>Tester</th><td></td></tr>
+                            <tr><th>Platform Name</th><td></td></tr>
+                            <tr><th>SKU</th><td></td></tr>
+                            <tr><th>Hw Phase</th><td></td></tr>
+                            <tr><th>OBS</th><td></td></tr>
+                            <tr><th>Block Type</th><td></td></tr>
+                            <tr><th>File</th><td></td></tr>
+                            <tr><th>KAT/KUT</th><td></td></tr>
+                            <tr><th>RTA</th><td></td></tr>
+                            <tr><th>ATT/UAT</th><td></td></tr>
+                            <tr><th>Run Cycle</th><td></td></tr>
+                            <tr><th>Fail Cycle/Total Cycle</th><td></td></tr>
+                            <tr><th>Case Note</th><td></td></tr>
+                            <tr><th>Comments</th><td></td></tr>
+                            <tr><th>Component List</th><td></td></tr>
+                            <tr><th>Comment</th><td></td></tr>
+                            <tr><th>Category</th><td></td></tr>
+                        </tbody>
+                    </table>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+            var compareBtn = document.getElementById('compareBtn');
+            var compareModal = new bootstrap.Modal(document.getElementById('compareModal'));
+            var configContainer = document.getElementById('configContainer');
+            var addConfigBtn = document.getElementById('addConfig');
+
+            compareBtn.addEventListener('click', function() {
+                compareModal.show();
+                addConfigRow();
+            });
+
+            addConfigBtn.addEventListener('click', function() {
+                addConfigRow();
+            });
+
+            function addConfigRow() {
+                var configRow = document.createElement('div');
+                configRow.className = 'row mb-3';
+                configRow.innerHTML = `
+                    <div class="col">
+                        <label>Task ID</label>
+                        <select class="form-select task-id-select custom-width-task-id">
+                            <option value="" selected>Choose Task ID</option>
+                            {% for row in rows %}
+                            <option value="{{ row['Task ID'] }}">{{ row['Task ID'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Case Title</label>
+                        <select class="form-select task-title-select custom-width-case-title">
+                            <option selected>Choose Task ID first</option>
+                        </select>
+                    </div>
+                `;
+                configContainer.appendChild(configRow);
+
+                // Add change event listener to the Task ID select
+                var taskIdSelect = configRow.querySelector('.task-id-select');
+                taskIdSelect.addEventListener('change', function() {
+    var taskId = this.value;
+    var taskTitleSelect = configRow.querySelector('.task-title-select');
+    if (taskId) {  // Check if taskId is not empty
+        // AJAX request to get the Task Title
+        $.ajax({
+            url: '/get-task-title/' + taskId,
+            type: 'GET',
+            success: function(response) {
+                // Clear the existing options
+                taskTitleSelect.innerHTML = '';
+                // Add an option for each Task Title
+                response.forEach(function(title) {
+                    var option = document.createElement('option');
+                    option.value = title;
+                    option.textContent = title;
+                    taskTitleSelect.appendChild(option);
+                });
+                // Get the selected Case Title
+                var caseTitle = taskTitleSelect.options[taskTitleSelect.selectedIndex].text;
+                // Display task details
+                displayTaskDetails(taskId, caseTitle);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    } else {
+        taskTitleSelect.innerHTML = '<option selected>Choose a Task ID first</option>';
+    }
+    var originalTaskIdOptions = document.querySelector('.task-id-select').innerHTML;
+
+    var clearAllBtn = document.getElementById('clearAllBtn');
+    clearAllBtn.addEventListener('click', function() {
+        // Clear all configurations
+        var configContainer = document.getElementById('configContainer');
+        var configRows = configContainer.querySelectorAll('.row');
+        configRows.forEach(function(row) {
+            var taskIdSelect = row.querySelector('.task-id-select');
+            taskIdSelect.innerHTML = originalTaskIdOptions;
+            var taskTitleSelect = row.querySelector('.task-title-select');
+            taskTitleSelect.innerHTML = '<option selected>Choose a Task ID first</option>'; // Reset the Case Title select element
+        });
+
+        // Clear details table data
+        var tbody = document.querySelector('#detailsTable tbody');
+        var rows = tbody.rows;
+        for (var i = 0; i < rows.length; i++) {
+            var cells = rows[i].cells;
+            for (var j = 1; j < cells.length; j++) { // Start from index 1 to skip the first cell (detail name or Task ID/Case Title)
+                cells[j].textContent = ''; // Clear cell content
+            }
+        }
+    });
+});
+
+
+function displayTaskDetails(taskId, caseTitle) {
+    // AJAX request to get task details
+    $.ajax({
+        url: `/get-task-details/${taskId}/${caseTitle}`,
+        type: 'GET',
+        success: function(response) {
+            // Assuming response is an array of details, use the first element
+            var details = response[0];
+            var tbody = document.querySelector('#detailsTable tbody');
+
+            // Ensure there are enough rows in the table for all details
+            while (tbody.rows.length < 20) {
+                var row = tbody.insertRow(-1);
+                // Create two cells for Task ID and Case Title
+                row.insertCell(0);
+                row.insertCell(1);
+            }
+
+            // Set Task ID and Case Title in the first two cells of each row
+            var rows = tbody.rows;
+            rows[0].cells[0].textContent = 'Task ID';
+            rows[0].cells[0].style.fontWeight = 'bold';
+            rows[1].cells[0].textContent = 'Case Title';
+            rows[1].cells[0].style.fontWeight = 'bold';
+
+            // Insert a new cell for Task ID and Case Title in each row
+            rows[0].insertCell(-1).textContent = taskId;
+            rows[1].insertCell(-1).textContent = caseTitle;
+
+            // Add details to the table
+            var detailKeys = [
+                'Pass/Fail', 'Tester', 'Platform Name', 'SKU', 'Hw Phase', 'OBS', 'Block Type',
+                'File', 'KAT/KUT', 'RTA', 'ATT/UAT', 'Run Cycle', 'Fail Cycle/Total Cycle',
+                'Case Note', 'Comments', 'Component List', 'Comment', 'Category'
+            ];
+
+            detailKeys.forEach(function(key, index) {
+                // Set the detail name in the first cell
+                rows[index + 2].cells[0].textContent = key;
+                rows[index + 2].cells[0].style.fontWeight = 'bold';
+                // Insert a new cell for the detail value
+                rows[index + 2].insertCell(-1).textContent = details[key] || '';
+            });
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+
+
+
+            }
+        });
+  
+            
+
+    </script>
+    
+<style>
+    .container {
+        min-height: calc(100% - 100px); 
+        padding-bottom: 60px; 
+        max-width: 90%; 
+    }   
+
+    #outputTable {
+        width: 100%;
+        overflow-x: auto;
+        border-collapse: collapse;
+        margin-top: 20px !important;
+    }
+
+    #outputTable th,
+    #outputTable td {
+        border: 1px solid #ddd; 
+        padding: 8px;
+        text-align: left; 
+        white-space: nowrap;
+    }
+
+    #outputTable th {
+        background-color: #b5e4f5; 
+    }
+
+    #outputTable tbody tr:hover {
+        background-color: #f6f6f6;
+    }
+    .custom-modal {
+        max-width: 1200px; 
+    }
+    #detailsTable td {
+        text-align: left !important;
+    }
+    .custom-width-task-id {
+        width: 280px; 
+    }
+
+    .custom-width-case-title {
+        width: 860px;
+    }
+
+</style>

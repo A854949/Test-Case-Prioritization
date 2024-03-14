@@ -33,6 +33,10 @@ db_config = {
     'database': 'test',
 }
 
+def get_db_connection():
+    conn = pymysql.connect(**db_config)
+    return conn
+
 @app.route('/health', methods=['GET'])
 def health():
     return 'ok'
@@ -200,6 +204,39 @@ def execute_query():
 
 #     except Exception as e:
 #         return jsonify({'error': str(e)})
+
+@app.route('/comparison')
+def comparison():
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute('SELECT * FROM taskReport')
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('comparison.html', rows=rows)
+
+@app.route('/get-task-title/<task_id>')
+def get_task_title(task_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute('SELECT `Case Title` FROM abc WHERE `Task ID` = %s', (task_id,))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    titles = [row['Case Title'] for row in rows]
+    return jsonify(titles)
+
+@app.route('/get-task-details/<task_id>/<case_title>')
+def get_task_details(task_id, case_title):
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    query = 'SELECT `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Case Note`, `Comments`, `Component List`, `Comment`, `Category` FROM abc WHERE `Task ID` = %s AND `Case Title` = %s'
+    cursor.execute(query, (task_id, case_title))
+    details = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(details)
+
 
 @app.route('/task_report', methods=['GET', 'POST'])
 def task_report():
