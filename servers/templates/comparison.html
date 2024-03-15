@@ -38,50 +38,19 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <table id="outputTable">
-            <thead>
-                <tr>
-                    <th>Task ID</th>
-                    <th>Task Title</th>
-                    <th>Testing Site</th>
-                    <th>Owner</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <button id="compareBtn" class="btn btn-primary">Compare</button>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in rows %}
-                <tr>
-                    <td>{{ row['Task ID'] or 'N/A' }}</td>
-                    <td>{{ row['Task Title'] or 'N/A' }}</td>
-                    <td>{{ row['Testing Site'] or 'N/A' }}</td>
-                    <td>{{ row['Owner'] or 'N/A' }}</td>
-                    <td>{{ row['Start Date'] or 'N/A' }}</td>
-                    <td>{{ row['End Date'] or 'N/A' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
-        <div class="modal-dialog custom-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="compareModalLabel"><b>Choose Task ID and Case Title to compare</h3></b>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="configContainer">
-                        <!-- Config rows will be added here dynamically -->
-                    </div>
-                    <button type="button" class="btn btn-secondary" id="addConfig">Add More</button>
-                    <button type="button" class="btn btn-success" id="clearAllBtn">Clear All</button>
-                </div>
-                <div class="modal-footer">
-                    <table class="table" id="detailsTable">
-                        <tbody>
+        <div class="compare-section">
+            <h4 class="title"><b>Choose Task ID and Case Title to compare</b></h4>
+            <div id="configContainer">
+                <!-- Config rows will be added here dynamically -->
+            </div>
+        
+            <div class="row justify-content-end">
+                <button type="button" class="col-1 btn btn-primary" id="addConfig">Add More</button>
+                <button type="button" class="col-1 btn btn-success" id="clearAllBtn">Clear All</button>
+            </div>
 
+            <table class="table" id="detailsTable">              
+                        <tbody>
                             <tr><th>Pass/Fail</th><td></td></tr>
                             <tr><th>Tester</th><td></td></tr>
                             <tr><th>Platform Name</th><td></td></tr>
@@ -111,112 +80,120 @@
 </html>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-            var compareBtn = document.getElementById('compareBtn');
-            var compareModal = new bootstrap.Modal(document.getElementById('compareModal'));
-            var configContainer = document.getElementById('configContainer');
-            var addConfigBtn = document.getElementById('addConfig');
-
-            compareBtn.addEventListener('click', function() {
-                compareModal.show();
-                addConfigRow();
-            });
-
-            addConfigBtn.addEventListener('click', function() {
-                addConfigRow();
-            });
-
-            function addConfigRow() {
-                var configRow = document.createElement('div');
-                configRow.className = 'row mb-3';
-                configRow.innerHTML = `
-                    <div class="col">
-                        <label>Task ID</label>
-                        <select class="form-select task-id-select custom-width-task-id">
-                            <option value="" selected>Choose Task ID</option>
-                            {% for row in rows %}
-                            <option value="{{ row['Task ID'] }}">{{ row['Task ID'] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label>Case Title</label>
-                        <select class="form-select task-title-select custom-width-case-title">
-                            <option selected>Choose Task ID first</option>
-                        </select>
-                    </div>
-                `;
-                configContainer.appendChild(configRow);
-
-                // Add change event listener to the Task ID select
-                var taskIdSelect = configRow.querySelector('.task-id-select');
-                taskIdSelect.addEventListener('change', function() {
-    var taskId = this.value;
-    var taskTitleSelect = configRow.querySelector('.task-title-select');
-    if (taskId) {  // Check if taskId is not empty
-        // AJAX request to get the Task Title
-        $.ajax({
-            url: '/get-task-title/' + taskId,
-            type: 'GET',
-            success: function(response) {
-                // Clear the existing options
-                taskTitleSelect.innerHTML = '';
-                // Add an option for each Task Title
-                response.forEach(function(title) {
-                    var option = document.createElement('option');
-                    option.value = title;
-                    option.textContent = title;
-                    taskTitleSelect.appendChild(option);
-                });
-                // Get the selected Case Title
-                var caseTitle = taskTitleSelect.options[taskTitleSelect.selectedIndex].text;
-                // Display task details
-                displayTaskDetails(taskId, caseTitle);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    } else {
-        taskTitleSelect.innerHTML = '<option selected>Choose a Task ID first</option>';
-    }
-    var originalTaskIdOptions = document.querySelector('.task-id-select').innerHTML;
-
+    var configContainer = document.getElementById('configContainer');
+    var addConfigBtn = document.getElementById('addConfig');
     var clearAllBtn = document.getElementById('clearAllBtn');
-    clearAllBtn.addEventListener('click', function() {
-        // Clear all configurations
-        var configContainer = document.getElementById('configContainer');
-        var configRows = configContainer.querySelectorAll('.row');
-        configRows.forEach(function(row) {
-            var taskIdSelect = row.querySelector('.task-id-select');
-            taskIdSelect.innerHTML = originalTaskIdOptions;
-            var taskTitleSelect = row.querySelector('.task-title-select');
-            taskTitleSelect.innerHTML = '<option selected>Choose a Task ID first</option>'; // Reset the Case Title select element
-        });
 
-        // Clear details table data
-        var tbody = document.querySelector('#detailsTable tbody');
-        var rows = tbody.rows;
-        for (var i = 0; i < rows.length; i++) {
-            var cells = rows[i].cells;
-            for (var j = 1; j < cells.length; j++) { // Start from index 1 to skip the first cell (detail name or Task ID/Case Title)
-                cells[j].textContent = ''; // Clear cell content
-            }
+    // 添加配置行
+    addConfigBtn.addEventListener('click', function() {
+        addConfigRow();
+    });
+
+    // 添加配置行函数
+    function addConfigRow() {
+    var configRow = document.createElement('div');
+    configRow.className = 'row mb-3';
+    configRow.innerHTML = `
+        <div class="col">
+            <label>Task ID</label>
+            <select class="form-select task-id-select custom-width-task-id">
+                <option value="" selected>Choose Task ID</option>
+                {% for row in rows %}
+                <option value="{{ row['Task ID'] }}">{{ row['Task ID'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col">
+            <label>Case Title</label>
+            <select class="form-select task-title-select custom-width-case-title">
+                <option selected>Please choose Task ID first</option>
+            </select>
+        </div>
+    `;
+    configContainer.appendChild(configRow);
+
+    // Initialize Select2 on the select elements
+    var taskIdSelect = $(configRow).find('.task-id-select').select2();
+    var taskTitleSelect = $(configRow).find('.task-title-select').select2();
+
+    // Add change event listeners
+    taskIdSelect.on('change', function() {
+        var taskId = $(this).val();
+        if (taskId) {
+            // AJAX request to get Task Title
+            $.ajax({
+                url: '/get-task-title/' + taskId,
+                type: 'GET',
+                success: function(response) {
+                    // Clear existing options
+                    taskTitleSelect.empty();
+                    taskTitleSelect.append('<option selected>Choose Case Title</option>');
+                    response.forEach(function(title) {
+                        var option = new Option(title, title);  // Use the Option constructor
+                        taskTitleSelect.append(option);
+                    });
+                    // Update Select2
+                    taskTitleSelect.select2();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            // Clear options except the first one
+            taskTitleSelect.empty();
+            taskTitleSelect.append('<option selected>Please choose Task ID first</option>');
+            // Update Select2
+            taskTitleSelect.select2();
         }
     });
+
+function escapeSelector(selector) {
+    return selector.replace(/([!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+}
+
+
+$(taskTitleSelect).on('change', function() {
+    var taskId = $(taskIdSelect).val();
+    var caseTitle = $(this).val();
+    if (caseTitle) {
+        displayTaskDetails(taskId, caseTitle);
+    }
 });
 
+    }
 
-function displayTaskDetails(taskId, caseTitle) {
-    // AJAX request to get task details
+    clearAllBtn.addEventListener('click', function() {
+    // 清除所有配置
+    var configRows = configContainer.querySelectorAll('.row');
+    configRows.forEach(function(row) {
+        configContainer.removeChild(row);
+    });
+    addConfigRow(); // 添加一个初始配置行
+
+    // 清除详细信息表格数据，保留所有表头
+    var tbody = document.querySelector('#detailsTable tbody');
+    var rows = tbody.rows;
+    for (var i = rows.length - 1; i >= 0; i--) {
+        if (i >= 0) { // 保留所有表头行
+            var cells = rows[i].cells;
+            for (var j = cells.length - 1; j > 1; j--) { // 从第三个单元格开始删除
+                rows[i].deleteCell(j);
+            }
+        }
+    }
+});
+
+    function displayTaskDetails(taskId, caseTitle) {
+    // AJAX 请求获取任务详细信息
     $.ajax({
         url: `/get-task-details/${taskId}/${caseTitle}`,
         type: 'GET',
         success: function(response) {
-            // Assuming response is an array of details, use the first element
             var details = response[0];
             var tbody = document.querySelector('#detailsTable tbody');
 
-            // Ensure there are enough rows in the table for all details
+            // 确保表格有足够的行来显示所有详细信息
             while (tbody.rows.length < 20) {
                 var row = tbody.insertRow(-1);
                 // Create two cells for Task ID and Case Title
@@ -235,7 +212,7 @@ function displayTaskDetails(taskId, caseTitle) {
             rows[0].insertCell(-1).textContent = taskId;
             rows[1].insertCell(-1).textContent = caseTitle;
 
-            // Add details to the table
+            // 添加详细信息到新列中
             var detailKeys = [
                 'Pass/Fail', 'Tester', 'Platform Name', 'SKU', 'Hw Phase', 'OBS', 'Block Type',
                 'File', 'KAT/KUT', 'RTA', 'ATT/UAT', 'Run Cycle', 'Fail Cycle/Total Cycle',
@@ -243,12 +220,17 @@ function displayTaskDetails(taskId, caseTitle) {
             ];
 
             detailKeys.forEach(function(key, index) {
-                // Set the detail name in the first cell
-                rows[index + 2].cells[0].textContent = key;
-                rows[index + 2].cells[0].style.fontWeight = 'bold';
-                // Insert a new cell for the detail value
-                rows[index + 2].insertCell(-1).textContent = details[key] || '';
-            });
+    // Ensure there is a row for this detail
+    if (index + 2 >= rows.length) {
+        tbody.insertRow(-1);
+    }
+    
+    // Set the detail name in the first cell as a <th> element
+    rows[index + 2].cells[0].outerHTML = `<th>${key}</th>`;
+    // Insert a new cell for the detail value
+    rows[index + 2].insertCell(-1).textContent = details[key] || '';
+});
+
         },
         error: function(error) {
             console.log(error);
@@ -257,14 +239,11 @@ function displayTaskDetails(taskId, caseTitle) {
 }
 
 
+    // 初始化页面时添加一个配置行
+    addConfigRow();
+});
 
-
-            }
-        });
-  
-            
-
-    </script>
+</script>
     
 <style>
     .container {
@@ -273,40 +252,49 @@ function displayTaskDetails(taskId, caseTitle) {
         max-width: 90%; 
     }   
 
-    #outputTable {
-        width: 100%;
-        overflow-x: auto;
-        border-collapse: collapse;
-        margin-top: 20px !important;
-    }
-
-    #outputTable th,
-    #outputTable td {
-        border: 1px solid #ddd; 
-        padding: 8px;
-        text-align: left; 
-        white-space: nowrap;
-    }
-
-    #outputTable th {
-        background-color: #b5e4f5; 
-    }
-
-    #outputTable tbody tr:hover {
-        background-color: #f6f6f6;
-    }
-    .custom-modal {
-        max-width: 1200px; 
-    }
-    #detailsTable td {
-        text-align: left !important;
-    }
     .custom-width-task-id {
-        width: 280px; 
+        width: 200px; 
     }
 
     .custom-width-case-title {
-        width: 860px;
+        width: 1300px;
     }
 
+    .col{
+        white-space: nowrap;
+    }
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+    }
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow{
+        height: 26px;
+        position: absolute;
+        top: 6px;
+        right: 1px;
+        width: 20px;
+    }
+
+    #configContainer {
+        background-color: #f6f6f6;
+        padding: 20px 15px 10px 15px; /* 上、右、下、左的内间距 */
+        border-radius: 10px;
+    }
+
+    .btn-primary {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .btn-success {
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .row.justify-content-end{
+        margin-right: 0px;
+    }
 </style>
