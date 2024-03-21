@@ -42,13 +42,12 @@ def health():
     return 'ok'
 
 
-@app.route('/', methods=['GET'])
-def front_end():
-    return render_template("index.html")
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -136,8 +135,6 @@ def reset_password():
         flash('Your password has been updated successfully.', 'success')
         return redirect(url_for('login'))
 
-        cursor.close()
-        conn.close()
     return render_template('reset_password.html', form=form)
 
 
@@ -205,46 +202,78 @@ def execute_query():
 #     except Exception as e:
 #         return jsonify({'error': str(e)})
 
-@app.route('/comparison')
-def comparison():
+# @app.route('/comparison')
+# def comparison():
+#     conn = get_db_connection()
+#     cursor = conn.cursor(pymysql.cursors.DictCursor)
+#     cursor.execute('SELECT * FROM taskReport')
+#     rows = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     return render_template('comparison.html', rows=rows)
+
+# @app.route('/get-task-title/<task_id>')
+# def get_task_title(task_id):
+#     conn = get_db_connection()
+#     cursor = conn.cursor(pymysql.cursors.DictCursor)
+#     cursor.execute('SELECT `Case Title` FROM abc WHERE `Task ID` = %s', (task_id,))
+#     rows = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     titles = [row['Case Title'] for row in rows]
+#     return jsonify(titles)
+
+# @app.route('/get-task-details/<taskId>')
+# def get_task_details(taskId):
+#     caseTitle = request.args.get('caseTitle', '')
+#     conn = get_db_connection()
+#     cursor = conn.cursor(pymysql.cursors.DictCursor)
+#     query = 'SELECT `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Case Note`, `Comments`, `Component List`, `Comment`, `Category` FROM abc WHERE `Task ID` = %s AND `Case Title` = %s'
+#     cursor.execute(query, (taskId, caseTitle))
+#     details = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     return jsonify(details)
+
+@app.route('/comparison_sit')
+def comparison_sit():
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute('SELECT * FROM taskReport')
-    rows = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT `Task ID` FROM taskReport')
+    task_ids = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('comparison.html', rows=rows)
+    return render_template('comparison_sit.html', task_ids=task_ids)
 
-@app.route('/get-task-title/<task_id>')
-def get_task_title(task_id):
+@app.route('/get-test-cases', methods=['POST'])
+def get_test_cases():
+    task_ids = request.json.get('taskIds', [])
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute('SELECT `Case Title` FROM abc WHERE `Task ID` = %s', (task_id,))
-    rows = cursor.fetchall()
+    
+    query = """
+    SELECT `Task ID`, `Case Title`, `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, 
+    `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, 
+    `Run Cycle`, `Fail Cycle/Total Cycle`, `Case Note`, `Comments`, `Component List`, 
+    `Comment`, `Category`
+    FROM abc WHERE `Task ID` IN (%s)
+    """
+    format_strings = ','.join(['%s'] * len(task_ids))
+    cursor.execute(query % format_strings, tuple(task_ids))
+
+    results = cursor.fetchall()
     cursor.close()
     conn.close()
-    titles = [row['Case Title'] for row in rows]
-    return jsonify(titles)
-
-@app.route('/get-task-details/<task_id>/<case_title>')
-def get_task_details(task_id, case_title):
-    conn = get_db_connection()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-    query = 'SELECT `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Case Note`, `Comments`, `Component List`, `Comment`, `Category` FROM abc WHERE `Task ID` = %s AND `Case Title` = %s'
-    cursor.execute(query, (task_id, case_title))
-    details = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify(details)
+    return jsonify(results)
 
 
-@app.route('/task_report', methods=['GET', 'POST'])
-def task_report():
+@app.route('/task_report_sit', methods=['GET', 'POST'])
+def task_report_sit():
     if not session.get('username'):
         flash('Please log in to access this page.', 'warning')
         return redirect(url_for('login'))
     if request.method == 'GET':
-        return render_template('task_report.html')
+        return render_template('task_report_sit.html')
     elif request.method == 'POST':
         try:
             data = request.get_json()
@@ -277,8 +306,8 @@ def task_report():
             return jsonify({'error': str(e)}), 500
 
 
-@app.route('/get_task_reports', methods=['GET'])
-def get_task_reports():
+@app.route('/get_task_reports_sit', methods=['GET'])
+def get_task_reports_sit():
     try:
         conn = pymysql.connect(**db_config)
         cursor = conn.cursor()
@@ -307,8 +336,8 @@ def get_task_reports():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/edit_task', methods=['POST'])
-def edit_task():
+@app.route('/edit_task_sit', methods=['POST'])
+def edit_task_sit():
     try:
         data = request.get_json()
         task_id = data.get('taskId')
@@ -339,8 +368,8 @@ def edit_task():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/delete_task', methods=['POST'])
-def delete_task():
+@app.route('/delete_task_sit', methods=['POST'])
+def delete_task_sit():
     try:
         data = request.get_json()
         task_id = data.get('taskId')
@@ -366,8 +395,8 @@ def delete_task():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/delete_task_unverified', methods=['POST'])
-def delete_task_unverified():
+@app.route('/delete_task_unverified_sit', methods=['POST'])
+def delete_task_unverified_sit():
     try:
         data = request.get_json()
         task_id = data.get('taskId')
@@ -384,8 +413,8 @@ def delete_task_unverified():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/upload_and_process', methods=['POST'])
-def upload_and_process():
+@app.route('/upload_and_process_sit', methods=['POST'])
+def upload_and_process_sit():
     file = request.files.get('file')
     
     if file and file.filename != '':
@@ -400,13 +429,13 @@ def upload_and_process():
         parser1.process_file(filepath, intermediate_output_path)
         parser2.parser2_process(intermediate_output_path, final_output_path)
 
-        insert_data_into_mysql(final_output_path)
+        insert_data_into_mysql_sit(final_output_path)
 
         return jsonify({'message': 'File processed and data inserted into database'})
     else:
         return '', 204
 
-def insert_data_into_mysql(csv_file_path):
+def insert_data_into_mysql_sit(csv_file_path):
     conn = pymysql.connect(**db_config)
     with conn.cursor() as cursor:
         with open(csv_file_path, 'r', encoding='utf-8') as csvfile:

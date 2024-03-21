@@ -37,30 +37,30 @@
     </head>
 <body>
     {% include 'navbar.html' %}
-
-    <div class="container">
-        <div style="overflow-x: auto;">
-            <table id="outputTable"  class="table-bordered table-sm" cellspacing="0" width="100%">
-                <thead>
-                    <tr>
-                        <th data-sortable="true">Task ID</th>
-                        <th data-sortable="true">Task Title</th>
-                        <th data-sortable="true">Testing Site</th>
-                        <th data-sortable="true">Start Date</th>
-                        <th data-sortable="true">End Date</th>
-                        <th data-sortable="true">Uploaded by</th>
-                        <th data-sortable="true">Uploaded at</th>
-                        <th></th>
-                            <button id="addTaskReportBtn" class="btn btn-primary">Add Task Report</button>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                </tbody>
-            </table>
+    <body class="d-flex flex-column" style="min-height: 100vh;">
+        <div class="content flex-grow-1">
+            <div class="container">
+                <table id="outputTable"  class="table-bordered table-sm" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th data-sortable="true">Task ID</th>
+                            <th data-sortable="true">Task Title</th>
+                            <th data-sortable="true">Testing Site</th>
+                            <th data-sortable="true">Start Date</th>
+                            <th data-sortable="true">End Date</th>
+                            <th data-sortable="true">Uploaded by</th>
+                            <th data-sortable="true">Uploaded at</th>
+                            <th></th>
+                                <button id="addTaskReportBtn" class="btn btn-primary">Add Task Report</button>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
+    
         
         <!-- 模態彈窗結構 -->
         <div id="taskReportModal" class="modal">
@@ -124,7 +124,7 @@
         });
         
         function fetchTaskReports() {
-            fetch('http://15.34.25.120:5010/get_task_reports')
+            fetch('http://15.34.25.120:5010/get_task_reports_sit')
             .then(response => response.json())
             .then(data => {
                 if (!table) {
@@ -211,7 +211,7 @@
                 endDate: document.getElementById('endDate').value
             };
         
-            var url = currentMode === 'add' ? 'http://15.34.25.120:5010/task_report' : 'http://15.34.25.120:5010/edit_task';
+            var url = currentMode === 'add' ? 'http://15.34.25.120:5010/task_report_sit' : 'http://15.34.25.120:5010/edit_task_sit';
         var method = 'POST';
 
         if (currentMode === 'edit') {
@@ -281,7 +281,7 @@
             })
             .then((willDelete) => {
                 if (willDelete) {
-                    fetch('http://15.34.25.120:5010/delete_task', {
+                    fetch('http://15.34.25.120:5010/delete_task_sit', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -326,7 +326,7 @@
     var formData = new FormData(this);
 
     if (currentMode === 'edit') {
-        fetch('http://15.34.25.120:5010/delete_task_unverified', {
+        fetch('http://15.34.25.120:5010/delete_task_unverified_sit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -350,7 +350,7 @@
 });
 
 function uploadFile(formData) {
-    fetch('http://15.34.25.120:5010/upload_and_process', {
+    fetch('http://15.34.25.120:5010/upload_and_process_sit', {
         method: 'POST',
         body: formData
     })
@@ -395,6 +395,9 @@ function uploadFile(formData) {
 </html>
 
 <style>
+.content {
+    flex: 1;
+}
 
 .container {
     min-height: calc(100% - 100px); 

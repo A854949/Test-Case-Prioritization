@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Case Prioritization</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+        <!-- CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet">
+
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>        
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>  
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    </head>
+<body class="d-flex flex-column" style="min-height: 100vh;">
+    <div class="content flex-grow-1">
+        {% include 'navbar.html' %}
+        <div class="container">
+            <div>
+                <h4 class="title"><b>Please select Task you want to compare</b></h4>
+                <select id="task-id-select" multiple>
+                    {% for task_id in task_ids %}
+                        <option value="{{ task_id['Task ID'] }}">{{ task_id['Task ID'] }}</option>
+                    {% endfor %}
+                </select>
+        
+                <div id="summary-table-container">
+                    <!-- Summary table will be generated here -->
+                </div>
+                <br>
+                <h4 class="title"><b>Summary</b></h4>
+                <div id="summary-highlight-container">
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel"><b>Test Case Details</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 這裡將動態填充詳細信息 -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 on the task-id-select element
+            $('#task-id-select').select2({
+                placeholder: "Select Task ID",
+                allowClear: true,
+                width: '100%',
+            }).on('change', function() {
+                var taskIds = $(this).val();
+                if (taskIds.length > 0) {
+                    $.ajax({
+                        url: '/get-test-cases',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({taskIds: taskIds}),
+                        success: function(response) {
+                            generateSummaryTable(taskIds, response);
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+                } else {
+                    $('#summary-table-container').empty();
+                }
+            });
+        });
+    
+        function generateSummaryTable(taskIds, data) {
+    var container = $('#summary-table-container');
+    var summaryContainer = $('#summary-highlight-container'); // 新增一個容器來存放摘要表格
+    container.empty(); // 清空容器
+    summaryContainer.empty(); // 清空摘要容器
+    if (taskIds.length === 0) {
+        return;
+    }
+    if (data.length > 0) {
+        var table = '<table class="table table-striped table-hover"><thead><tr><th>Case Title</th>';
+        var summaryTable = '<table class="table table-striped table-hover"><thead><tr><th>Case Title</th>'; // 新增一個變數來存放摘要表格的 HTML
+        taskIds.forEach(function(taskId) {
+            table += '<th>' + taskId + '</th>';
+            summaryTable += '<th>' + taskId + '</th>'; // 為摘要表格添加表頭
+        });
+        table += '</tr></thead><tbody>';
+        summaryTable += '</tr></thead><tbody>'; // 結束摘要表格的表頭
+
+        var resultsByCaseTitleAndTaskId = {};
+        data.forEach(function(item) {
+            var fullCaseTitle = item['Case Title'];
+            var taskId = item['Task ID'];
+            if (!resultsByCaseTitleAndTaskId[fullCaseTitle]) {
+                resultsByCaseTitleAndTaskId[fullCaseTitle] = {};
+            }
+            resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] = item;
+        });
+
+        Object.keys(resultsByCaseTitleAndTaskId).forEach(function(fullCaseTitle) {
+            table += '<tr><td>' + fullCaseTitle.split('(')[0].trim() + '</td>';
+            var hasFail = taskIds.some(function(taskId) {
+                var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
+                return (item['Pass/Fail'] || '').toLowerCase() === 'fail';
+            });
+            var highlight = hasFail ? ' style="background-color: #FFFCCC;"' : '';
+            taskIds.forEach(function(taskId) {
+                var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
+                var result = item['Pass/Fail'] || '-';
+                table += `<td${highlight}><a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a></td>`;
+            });
+            table += '</tr>';
+            if (hasFail) {
+                // 只有當該行包含 "fail" 結果時，才將其添加到摘要表格中
+                summaryTable += '<tr' + highlight + '><td>' + fullCaseTitle.split('(')[0].trim() + '</td>';
+                taskIds.forEach(function(taskId) {
+                    var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
+                    var result = item['Pass/Fail'] || '-';
+                    summaryTable += `<td>${result}</td>`;
+                });
+                summaryTable += '</tr>';
+            }
+        });
+
+        table += '</tbody></table>';
+        summaryTable += '</tbody></table>'; // 結束摘要表格的 HTML
+        container.append(table);
+        summaryContainer.append(summaryTable); // 將摘要表格添加到摘要容器中
+    } else {
+        container.append('<p>No test cases found.</p>');
+        summaryContainer.append('<p>No highlighted test cases found.</p>'); // 如果沒有高亮的測試案例，顯示相應的信息
+    }
+}
+
+
+
+
+
+$(document).on('click', '.result-link', function() {
+    var item = $(this).data('item');
+    var modalBody = $('#detailsModal .modal-body');
+    modalBody.empty(); // 清空之前的內容
+
+    // 建立一個新的表格來顯示詳細信息，並添加 table-striped 類
+    var table = '<table class="table table-striped">';
+    table += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
+
+    // 填充表格內容
+    Object.keys(item).forEach(function(key) {
+        table += `<tr><td>${key}</td><td>${item[key]}</td></tr>`;
+    });
+
+    table += '</tbody></table>';
+    modalBody.append(table); // 將表格添加到模態框的主體中
+});
+
+$('#task-id-select').on('change', function() {
+    var taskIds = $(this).val();
+    if (taskIds.length > 0) {
+        $.ajax({
+            url: '/get-test-cases',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({taskIds: taskIds}),
+            success: function(response) {
+                generateSummaryTable(taskIds, response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    } else {
+        $('#summary-table-container').empty();
+        $('#summary-highlight-container').empty(); // 清空摘要容器
+    }
+});
+
+
+    </script>
+    
+</body>
+{% include 'footer.html' %}
+
+</html>
+
+<style>
+    .content {
+        flex: 1;
+    }
+
+    .container {
+        min-height: calc(100% - 100px); 
+        padding-bottom: 60px; 
+        max-width: 90%; 
+    }   
+
+    #summary-table-container {
+        margin-top: 20px;
+        max-height: 400px; /* 設置一個最大高度 */
+        overflow-y: auto; /* 啟用垂直滾動 */
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        height: 40px;
+    }
+    .result-link {
+        text-decoration: none;
+    }
+    .result-link:hover {
+        text-decoration: underline;
+    }
+    .modal-backdrop {
+        opacity: 0.3 !important;
+}
+.select2-container--default .select2-search--inline .select2-search__field {
+    justify-content: center !important;
+}
+</style>
+
