@@ -34,41 +34,43 @@
 
 
     </head>
-<body>
+<body class="d-flex flex-column" style="min-height: 100vh;">
+    <div class="content flex-grow-1">
 
     {% include 'navbar.html' %}
 
-<div class="container-fluid">
-    <div class="col-md-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
+        <div class="container">
+            <div class="col-md-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <h1>Sign In</h1>
+            <div class="row">
+                    <form action="{{ url_for('login') }}" method="post" class="form" role="form">
+                        {{ form.csrf_token }}
+                        <div class="form-group required">
+                            {{ form.username.label(class="control-label") }}
+                            {{ form.username(class="form-control") }}
+                        </div>
+                        <div class="form-group required">
+                            {{ form.password.label(class="control-label") }}
+                            {{ form.password(class="form-control") }}
+                        </div>
+                        <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Sign In">
+                    </form>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <h1>Sign In</h1>
-    <div class="row">
-            <form action="{{ url_for('login') }}" method="post" class="form" role="form">
-                {{ form.csrf_token }}
-                <div class="form-group required">
-                    {{ form.username.label(class="control-label") }}
-                    {{ form.username(class="form-control") }}
-                </div>
-                <div class="form-group required">
-                    {{ form.password.label(class="control-label") }}
-                    {{ form.password(class="form-control") }}
-                </div>
-                <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Sign In">
-            </form>
+            </div>
+            <p>New User? <a href="/register" class="custom-link">Click to Register!</a></p>
+            <p>Forgot Your Password? <a href="/reset_password" class="custom-link">Click to Reset It</a></p>
         </div>
     </div>
-    <p>New User? <a href="/register" class="custom-link">Click to Register!</a></p>
-    <p>Forgot Your Password? <a href="/reset_password" class="custom-link">Click to Reset It</a></p>
-</div>
 <br>
 
 </body>   
@@ -79,18 +81,18 @@
 
 
 <style>
-html {
-    min-height: 100%;
-    position: relative;
-}
-        
-body {
-    margin-bottom: 150px;
+
+
+.content {
+    flex: 1;
 }
 
-.container-fluid {
+.container {
+    min-height: calc(100% - 100px); 
+    padding-bottom: 20px;
     max-width: 90%; 
-}
+}    
+
 
 label {
     display: inline-block;

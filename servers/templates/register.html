@@ -34,87 +34,87 @@
 
 
     </head>
-<body>
 
-    {% include 'navbar.html' %}
+<body class="d-flex flex-column" style="min-height: 100vh;">
+    <div class="content flex-grow-1">
 
-<div class="container-fluid">
+        {% include 'navbar.html' %}
 
-    <h1>Register</h1>
-    <div class="row">
-        <div class="col-md-4">
-            <form action="/register" method="post" class="form" role="form">
-                {{ form.csrf_token }}
-                <div class="form-group required">
-                    {{ form.username.label(class="control-label" + (" error" if form.username.errors else "")) }}
-                    {{ form.username(class="form-control" + (" error" if form.username.errors else "")) }}
-                    {% if form.username.errors %}
-                        <div class="text-danger">
-                            {% for error in form.username.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
+        <div class="container">
+
+            <h1>Register</h1>
+            <div class="row">
+                <div class="col-md-4">
+                    <form action="/register" method="post" class="form" role="form">
+                        {{ form.csrf_token }}
+                        <div class="form-group required">
+                            {{ form.username.label(class="control-label" + (" error" if form.username.errors else "")) }}
+                            {{ form.username(class="form-control" + (" error" if form.username.errors else "")) }}
+                            {% if form.username.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}<br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group required">
-                    {{ form.email.label(class="control-label" + (" error" if form.email.errors else "")) }}
-                    {{ form.email(class="form-control" + (" error" if form.email.errors else "")) }}
-                    {% if form.email.errors %}
-                        <div class="text-danger">
-                            {% for error in form.email.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
+                        
+                        <div class="form-group required">
+                            {{ form.email.label(class="control-label" + (" error" if form.email.errors else "")) }}
+                            {{ form.email(class="form-control" + (" error" if form.email.errors else "")) }}
+                            {% if form.email.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}<br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group required">
-                    {{ form.password.label(class="control-label") }}
-                    {{ form.password(class="form-control") }}
-                    {% if form.password.errors %}
-                        <div class="text-danger">
-                            {% for error in form.password.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
+                        
+                        <div class="form-group required">
+                            {{ form.password.label(class="control-label") }}
+                            {{ form.password(class="form-control") }}
+                            {% if form.password.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}<br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                <div class="form-group required">
-                    {{ form.password2.label(class="control-label" + (" error" if form.password2.errors else "")) }}
-                    {{ form.password2(class="form-control" + (" error" if form.password2.errors else "")) }}
-                    {% if form.password2.errors %}
-                        <div class="text-danger">
-                            {% for error in form.password2.errors %}
-                                {{ error }}<br>
-                            {% endfor %}
+                        <div class="form-group required">
+                            {{ form.password2.label(class="control-label" + (" error" if form.password2.errors else "")) }}
+                            {{ form.password2(class="form-control" + (" error" if form.password2.errors else "")) }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.password2.errors %}
+                                        {{ error }}<br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-            
-                <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Register">
-            </form>
-            
                     
-        </div> 
-    </div>    
-</div>
+                        <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Register">
+                    </form>
+                                               
+                </div> 
+            </div>    
+        </div>
+    </div>
 </body>   
 {% include 'footer.html' %}
 </html>
 <style>
-    html {
-        min-height: 100%;
-        position: relative;
-    }
-            
-    body {
-        margin-bottom: 150px;
-    }
 
-    .container-fluid {
-        max-width: 90%; 
-    } 
+.content {
+    flex: 1;
+}
+
+.container {
+    min-height: calc(100% - 100px); 
+    padding-bottom: 20px;
+    max-width: 90%; 
+}     
 
     label {
         display: inline-block;

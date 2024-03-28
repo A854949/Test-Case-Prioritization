@@ -237,6 +237,9 @@ def execute_query():
 
 @app.route('/comparison_sit')
 def comparison_sit():
+    if not session.get('username'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('login'))
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     cursor.execute('SELECT DISTINCT `Task ID` FROM taskReport')
@@ -244,6 +247,7 @@ def comparison_sit():
     cursor.close()
     conn.close()
     return render_template('comparison_sit.html', task_ids=task_ids)
+
 
 @app.route('/get-test-cases', methods=['POST'])
 def get_test_cases():
