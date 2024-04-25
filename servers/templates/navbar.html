@@ -22,11 +22,20 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Test Case
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}">SIT</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index_bios') }}">BIOS</a></li>
+                        </ul>
+                    </li> 
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Add Task Report
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <li><a class="dropdown-item" href="{{ url_for('task_report_sit') }}">SIT</a></li>
-                            <li><a class="dropdown-item" href="#">BIOS</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('task_report_bios') }}">BIOS</a></li>
                         </ul>
                     </li> 
 
@@ -36,7 +45,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="comparisonDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('comparison_sit') }}">SIT</a></li>
-                            <li><a class="dropdown-item" href="#">BIOS</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('comparison_bios') }}">BIOS</a></li>
                         </ul>
                     </li>
                     
@@ -100,13 +109,13 @@
             }
         });
         // 檢查是否選擇了 "Add Task Report" 下的 "SIT" 或 "BIOS"
-        if (currentUrl.includes('/task_report_sit') || currentUrl.includes('/bios')) {
+        if (currentUrl.includes('/task_report_sit') || currentUrl.includes('/task_report_bios')) {
             // 將 "Add Task Report" 選項設置為粗體
             $('#navbarDropdownMenuLink').addClass('active');
         }
 
         // 檢查是否選擇了 "Comparison" 下的 "SIT" 或 "BIOS"
-        if (currentUrl.includes('/comparison_sit') || currentUrl.includes('/bios')) {
+        if (currentUrl.includes('/comparison_sit') || currentUrl.includes('/comparison_bios')) {
             // 將 "Comparison" 選項設置為粗體
             $('#comparisonDropdown').addClass('active');
         }

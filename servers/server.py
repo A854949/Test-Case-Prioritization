@@ -3,8 +3,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from flask_bcrypt import Bcrypt
 import os
-import parser1
-import parser2
+import parser1, parser2, parser3
 import csv
 import pymysql
 import mysql.connector
@@ -46,7 +45,6 @@ def health():
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 
 class RegistrationForm(FlaskForm):
@@ -144,6 +142,7 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+#SIT
 
 @app.route('/execute_query', methods=['POST'])
 def execute_query():
@@ -166,75 +165,6 @@ def execute_query():
     except Exception as e:
         return jsonify({'error': str(e)})
     
-
-# @app.route('/get-dropdown-data', methods=['GET'])
-# def get_dropdown_data():
-#     try:
-#         conn = pymysql.connect(**db_config)
-#         cursor = conn.cursor()
-            
-#         cursor.execute('SELECT DISTINCT `Task ID` FROM abc ORDER BY `Task ID`')
-#         task_id = [taskid[0] for taskid in cursor.fetchall()]
-
-#         cursor.execute('SELECT DISTINCT `Platform Name` FROM abc ORDER BY `Platform Name`')
-#         platform_names = [name[0] for name in cursor.fetchall()]
-
-#         cursor.execute('SELECT DISTINCT `Hw Phase` FROM abc ORDER BY `Hw Phase`')
-#         hw_phases = [phase[0] for phase in cursor.fetchall()]
-
-#         cursor.execute('SELECT DISTINCT `Category` FROM abc ORDER BY `Category`')
-#         categories = [category[0] for category in cursor.fetchall()]
-
-#         cursor.execute('SELECT DISTINCT `Case Title` FROM abc ORDER BY `Case Title`')
-#         case_titles = [title[0] for title in cursor.fetchall()]
-
-#         cursor.close()
-#         conn.close()
-
-#         return jsonify({
-#             'taskIds': task_id,
-#             'platformNames': platform_names,
-#             'hwPhases': hw_phases,
-#             'categories': categories,
-#             'caseTitles': case_titles
-#         })
-
-#     except Exception as e:
-#         return jsonify({'error': str(e)})
-
-# @app.route('/comparison')
-# def comparison():
-#     conn = get_db_connection()
-#     cursor = conn.cursor(pymysql.cursors.DictCursor)
-#     cursor.execute('SELECT * FROM taskReport')
-#     rows = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('comparison.html', rows=rows)
-
-# @app.route('/get-task-title/<task_id>')
-# def get_task_title(task_id):
-#     conn = get_db_connection()
-#     cursor = conn.cursor(pymysql.cursors.DictCursor)
-#     cursor.execute('SELECT `Case Title` FROM abc WHERE `Task ID` = %s', (task_id,))
-#     rows = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     titles = [row['Case Title'] for row in rows]
-#     return jsonify(titles)
-
-# @app.route('/get-task-details/<taskId>')
-# def get_task_details(taskId):
-#     caseTitle = request.args.get('caseTitle', '')
-#     conn = get_db_connection()
-#     cursor = conn.cursor(pymysql.cursors.DictCursor)
-#     query = 'SELECT `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Case Note`, `Comments`, `Component List`, `Comment`, `Category` FROM abc WHERE `Task ID` = %s AND `Case Title` = %s'
-#     cursor.execute(query, (taskId, caseTitle))
-#     details = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return jsonify(details)
-
 @app.route('/comparison_sit')
 def comparison_sit():
     if not session.get('username'):
@@ -249,8 +179,8 @@ def comparison_sit():
     return render_template('comparison_sit.html', task_ids=task_ids)
 
 
-@app.route('/get-test-cases', methods=['POST'])
-def get_test_cases():
+@app.route('/get-sit-test-cases', methods=['POST'])
+def get_sit_test_cases():
     task_ids = request.json.get('taskIds', [])
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -462,6 +392,281 @@ def insert_data_into_mysql_sit(csv_file_path):
         conn.commit()
     cursor.close()
     conn.close()
+
+#BIOS       
+@app.route('/index_bios')
+def index_bios():
+    return render_template('index_bios.html')
+ 
+@app.route('/task_report_bios', methods=['GET', 'POST'])
+def task_report_bios():
+    if not session.get('username'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('login'))
+    if request.method == 'GET':
+        return render_template('task_report_bios.html')
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            bios_version = data.get('biosVersion')
+            creator = session.get('username')
+            created_at = datetime.now().strftime('%Y/%m/%d %H:%M')
+            insert_sql = """
+            INSERT INTO biosTaskReport (`BIOS Version`, `Creator`, `Created_at`)
+            VALUES (%s, %s, %s)
+            """
+
+            conn = pymysql.connect(**db_config)
+            with conn.cursor() as cursor:
+                cursor.execute(insert_sql, (bios_version, creator, created_at))
+                conn.commit()
+
+            return jsonify({'message': 'Task report added successfully'})
+
+        except IntegrityError as e:
+
+            if e.args[0] == 1062:
+                return jsonify({'error': 'BIOS Version already exists.'}), 400
+            else:
+                return jsonify({'error': 'An unexpected database error occurred.'}), 500
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+
+@app.route('/get_task_reports_bios', methods=['GET'])
+def get_task_reports_bios():
+    try:
+        conn = pymysql.connect(**db_config)
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT `BIOS Version`,`Creator`, `Created_at` FROM biosTaskReport')
+        task_reports = cursor.fetchall()
+
+        tasks = []
+        for report in task_reports:
+            tasks.append({
+                'biosVersion': report[0],
+                'creator': report[1],
+                'createdAt': report[2].strftime('%Y/%m/%d %H:%M') if report[2] else None
+            })
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(tasks)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/edit_task_bios', methods=['POST'])
+def edit_task_bios():
+    try:
+        data = request.get_json()
+        bios_version = data.get('biosVersion')
+        creator = session.get('username')
+        created_at = datetime.now().strftime('%Y/%m/%d %H:%M')       
+        update_sql = """
+        UPDATE biosTaskReport SET 
+            `Creator` = %s, 
+            `Created_at` = %s   
+        WHERE `BIOS Version` = %s
+        """
+        conn = pymysql.connect(**db_config)
+        with conn.cursor() as cursor:
+            cursor.execute(update_sql, (creator, created_at, bios_version))
+            conn.commit()
+
+        return jsonify({'message': 'Task updated successfully'})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/delete_task_bios', methods=['POST'])
+def delete_task_bios():
+    try:
+        data = request.get_json()
+        bios_version = data.get('biosVersion')
+
+        check_creator_sql = "SELECT `Creator` FROM biosTaskReport WHERE `BIOS Version` = %s"
+        conn = pymysql.connect(**db_config)
+        with conn.cursor() as cursor:
+            cursor.execute(check_creator_sql, (bios_version,))
+            creator = cursor.fetchone()
+            if not creator or creator[0] != session.get('username'):
+                return jsonify({'error': 'You are not authorized to delete this task report.'}), 403
+
+        delete_task_report_sql = "DELETE FROM biosTaskReport WHERE `BIOS Version` = %s"
+        delete_def_records_sql = "DELETE FROM def WHERE `BIOS Version` = %s"
+
+        with conn.cursor() as cursor:
+            cursor.execute(delete_task_report_sql, (bios_version,))
+            cursor.execute(delete_def_records_sql, (bios_version,))
+            conn.commit()
+
+        return jsonify({'message': 'Task deleted successfully'})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/delete_task_unverified_bios', methods=['POST'])
+def delete_task_unverified_bios():
+    try:
+        data = request.get_json()
+        bios_version = data.get('biosVersion')
+
+        delete_def_records_sql = "DELETE FROM def WHERE `BIOS Version` = %s"
+
+        conn = pymysql.connect(**db_config)
+        with conn.cursor() as cursor:
+            cursor.execute(delete_def_records_sql, (bios_version,))
+            conn.commit()
+
+        return jsonify({'message': 'Task deleted successfully'})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/upload_and_process_bios', methods=['POST'])
+def upload_and_process_bios():
+    file = request.files.get('file')
+    
+    if file and file.filename != '':
+        filename = secure_filename(file.filename)
+        save_directory = 'C:/Users/Mika Shih/Desktop/testcasedb_UAT/servers/uploads'
+        filepath = os.path.join(save_directory, filename)
+        file.save(filepath)
+
+        final_output_path = 'C:/Users/Mika Shih/Desktop/testcasedb_UAT/servers/final_output.csv'
+
+        parser3.process_file(filepath, final_output_path)
+
+        insert_data_into_mysql_bios(final_output_path)
+
+        return jsonify({'message': 'File processed and data inserted into database'})
+    else:
+        return '', 204
+
+def insert_data_into_mysql_bios(csv_file_path):
+    conn = pymysql.connect(**db_config)
+    with conn.cursor() as cursor:
+        with open(csv_file_path, 'r', encoding='utf-8') as csvfile:
+            csvreader = csv.reader(csvfile)
+            next(csvreader) 
+            for row in csvreader:
+                insert_sql = """
+                INSERT INTO def (
+                    `UUID`, `BIOS Version`, `Test Case Number`, `Test Case Name`, `Result`, 
+                    `Comment`
+                ) VALUES (
+                    UUID(), %s, %s, %s, %s, %s
+                )
+                """
+                cursor.execute(insert_sql, tuple(row))
+        conn.commit()
+    cursor.close()
+    conn.close()
+
+@app.route('/comparison_bios')
+def comparison_bios():
+    if not session.get('username'):
+        flash('Please log in to access this page.', 'warning')
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute('SELECT DISTINCT `BIOS Version` FROM biosTaskReport')
+    bios_versions = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('comparison_bios.html', bios_versions=bios_versions)
+
+
+@app.route('/get-bios-test-cases', methods=['POST'])
+def get_bios_test_cases():
+    bios_versions = request.json.get('biosVersions', [])
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    
+    query = """
+    SELECT `BIOS Version`, `Test Case Number`, `Test Case Name`, `Result`, `Comment`
+    FROM def WHERE `BIOS Version` IN (%s)
+    """
+    format_strings = ','.join(['%s'] * len(bios_versions))
+    cursor.execute(query % format_strings, tuple(bios_versions))
+
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(results)
+
+# @app.route('/get-dropdown-data', methods=['GET'])
+# def get_dropdown_data():
+#     try:
+#         conn = pymysql.connect(**db_config)
+#         cursor = conn.cursor()
+            
+#         cursor.execute('SELECT DISTINCT `Task ID` FROM abc ORDER BY `Task ID`')
+#         task_id = [taskid[0] for taskid in cursor.fetchall()]
+
+#         cursor.execute('SELECT DISTINCT `Platform Name` FROM abc ORDER BY `Platform Name`')
+#         platform_names = [name[0] for name in cursor.fetchall()]
+
+#         cursor.execute('SELECT DISTINCT `Hw Phase` FROM abc ORDER BY `Hw Phase`')
+#         hw_phases = [phase[0] for phase in cursor.fetchall()]
+
+#         cursor.execute('SELECT DISTINCT `Category` FROM abc ORDER BY `Category`')
+#         categories = [category[0] for category in cursor.fetchall()]
+
+#         cursor.execute('SELECT DISTINCT `Case Title` FROM abc ORDER BY `Case Title`')
+#         case_titles = [title[0] for title in cursor.fetchall()]
+
+#         cursor.close()
+#         conn.close()
+
+#         return jsonify({
+#             'taskIds': task_id,
+#             'platformNames': platform_names,
+#             'hwPhases': hw_phases,
+#             'categories': categories,
+#             'caseTitles': case_titles
+#         })
+
+#     except Exception as e:
+#         return jsonify({'error': str(e)})
+
+# @app.route('/comparison')
+# def comparison():
+#     conn = get_db_connection()
+#     cursor = conn.cursor(pymysql.cursors.DictCursor)
+#     cursor.execute('SELECT * FROM taskReport')
+#     rows = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     return render_template('comparison.html', rows=rows)
+
+# @app.route('/get-task-title/<task_id>')
+# def get_task_title(task_id):
+#     conn = get_db_connection()
+#     cursor = conn.cursor(pymysql.cursors.DictCursor)
+#     cursor.execute('SELECT `Case Title` FROM abc WHERE `Task ID` = %s', (task_id,))
+#     rows = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     titles = [row['Case Title'] for row in rows]
+#     return jsonify(titles)
+
+# @app.route('/get-task-details/<taskId>')
+# def get_task_details(taskId):
+#     caseTitle = request.args.get('caseTitle', '')
+#     conn = get_db_connection()
+#     cursor = conn.cursor(pymysql.cursors.DictCursor)
+#     query = 'SELECT `Pass/Fail`, `Tester`, `Platform Name`, `SKU`, `Hw Phase`, `OBS`, `Block Type`, `File`, `KAT/KUT`, `RTA`, `ATT/UAT`, `Run Cycle`, `Fail Cycle/Total Cycle`, `Case Note`, `Comments`, `Component List`, `Comment`, `Category` FROM abc WHERE `Task ID` = %s AND `Case Title` = %s'
+#     cursor.execute(query, (taskId, caseTitle))
+#     details = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     return jsonify(details)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Case Prioritization</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+        <!-- CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet">
+
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>        
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>  
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    </head>
+<body>
+    {% include 'navbar.html' %}
+    <body class="d-flex flex-column" style="min-height: 100vh;">
+        <div class="content flex-grow-1">
+            <div class="container">
+                <table id="outputTable"  class="table-bordered table-sm" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th data-sortable="true">BIOS Version</th>
+                            <th data-sortable="true">Uploaded by</th>
+                            <th data-sortable="true">Uploaded at</th>
+                            <th></th>
+                                <button id="addTaskReportBtn" class="btn btn-primary">Add Task Report</button>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+        
+        <!-- 模態彈窗結構 -->
+        <div id="taskReportModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <form id="taskReportForm" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <label for="biosVersion" class="required-label"><strong>BIOS Version</strong></label>
+                        <input type="text" id="biosVersion" name="biosVersion" class="form-control">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="file" class="required-label"><strong>Upload File</strong></label> 
+                            <input type="file" id="file" name="file" class="form-control"  required pattern=".*\S+.*"  title="This field is required">                      
+                        </div>
+                    </div>
+                    <div class="form-row submit-row">
+                        <div class="form-group submit-group">
+                            <input type="submit" value="Submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>     
+    </div>
+
+    <script>
+
+        var table;
+        var currentMode = 'add';
+        
+        $(document).ready(function() {
+            fetchTaskReports();
+        });
+        
+        function fetchTaskReports() {
+            fetch('http://15.34.25.120:5010/get_task_reports_bios')
+            .then(response => response.json())
+            .then(data => {
+                if (!table) {
+                    initializeDataTable(data);
+                } else {
+                    updateDataTable(data);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        }
+        
+        function initializeDataTable(taskData) {
+            table = $('#outputTable').DataTable({
+                paging: true,
+                pagingType: "full_numbers",
+                ordering: true,
+                searching: true,
+                info: true,
+                lengthChange: false,
+                order: [[0, 'asc']],
+                language: {
+                    lengthMenu: "Show _MENU_ items",
+                    paginate: {
+                        next: '<i class="fas fa-angle-right"></i>',
+                        previous: '<i class="fas fa-angle-left"></i>',
+                        first: '<i class="fas fa-angle-double-left"></i>',
+                        last: '<i class="fas fa-angle-double-right"></i>'
+                    }
+                },
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets: [3, 4]
+                    }
+                ],
+            });
+            updateDataTable(taskData);
+        }
+        
+        function updateDataTable(taskData) {
+            var formattedData = taskData.map(task => [
+                task.biosVersion || 'N/A',
+                task.creator || 'N/A',
+                task.createdAt || 'N/A',
+                '<button class="btn btn-warning btn-sm edit-btn" data-bios-version="' + (task.biosVersion || '') + '">Upload</button>',
+                '<button class="btn btn-danger btn-sm delete-btn" data-bios-version="' + (task.biosVersion || '') + '">Delete</button>'
+            ]);
+            table.clear().rows.add(formattedData).draw();
+        }
+        
+        document.getElementById('addTaskReportBtn').onclick = function() {
+            currentMode = 'add';
+            document.getElementById('biosVersion').disabled = false;
+            document.getElementById('taskReportModal').style.display = 'block';
+        };
+        
+        var modal = document.getElementById('taskReportModal');
+        var span = document.getElementsByClassName("close")[0];
+        
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        
+        document.getElementById('taskReportForm').onsubmit = function(e) {
+            e.preventDefault();
+        
+            var taskData = {
+                biosVersion: document.getElementById('biosVersion').value,
+            };
+        
+            var url = currentMode === 'add' ? 'http://15.34.25.120:5010/task_report_bios' : 'http://15.34.25.120:5010/edit_task_bios';
+        var method = 'POST';
+
+        if (currentMode === 'edit') {
+            taskData.biosVersion = document.getElementById('biosVersion').value;
+        }
+
+        fetch(url, {
+    method: method,
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(taskData)
+})
+.then(response => {
+    if (response.headers.get('Content-Type').includes('application/json')) {
+        return response.json();
+    } else {
+        throw new Error('收到非 JSON 回應');
+    }
+})
+.then(data => {
+    if (data.message) {
+        alert(data.message);
+        fetchTaskReports();
+        document.getElementById('taskReportForm').reset();
+        modal.style.display = "none";
+    } else if (data.error) {
+        alert(data.error);
+    }
+})
+.catch((error) => {
+    alert(error);
+});
+
+    };
+        
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('edit-btn')) {
+                var biosVersion = event.target.getAttribute('data-bios-version');
+                editTask(biosVersion);
+            }
+            if (event.target.classList.contains('delete-btn')) {
+                var biosVersion = event.target.getAttribute('data-bios-version');
+                deleteTask(biosVersion);
+            }
+        });
+        function editTask(biosVersion) {
+        var taskData = table.rows().data().filter(row => row[0] === biosVersion)[0];
+        if (taskData) {
+            document.getElementById('biosVersion').value = taskData[0];
+            document.getElementById('biosVersion').disabled = true;
+            currentMode = 'edit';
+            modal.style.display = 'block';
+        }
+    }
+        function deleteTask(biosVersion) {
+            swal({
+                title: "Are you sure?",
+                text: `You will delete this record and all of the records of ${biosVersion}!`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    fetch('http://15.34.25.120:5010/delete_task_bios', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ biosVersion: biosVersion }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            swal("Deleted!", `${biosVersion} has been deleted successfully.`, "success");
+                            fetchTaskReports();
+                        } else if (data.error) {
+                            swal("Error!", data.error, "error");
+                        }
+                    })
+                    .catch((error) => {
+                        swal("Error!", error.toString(), "error");
+                    });
+                }
+            });
+        }
+        
+    document.getElementById('taskReportForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var biosVersion = document.getElementById('biosVersion').value;
+    var fileInput = document.getElementById('file');
+    var file = fileInput.files[0];
+
+    if (file) {
+        var fileName = file.name;
+        var fileType = file.type;
+        if (!['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel.sheet.macroEnabled.12'].includes(fileType)) {
+            alert('Only Excel files are allowed.');
+        return;
+        }
+    } else {
+        alert('Please select a file.');
+        return;
+    }
+
+    var formData = new FormData(this);
+
+    if (currentMode === 'edit') {
+        fetch('http://15.34.25.120:5010/delete_task_unverified_bios', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ biosVersion: biosVersion }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                uploadFile(formData);
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch((error) => {
+            alert(error);
+        });
+    } else {
+        uploadFile(formData);
+    }
+});
+
+function uploadFile(formData) {
+    fetch('http://15.34.25.120:5010/upload_and_process_bios', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            fetchTaskReports();
+            document.getElementById('taskReportForm').reset();
+            modal.style.display = "none";
+        } else if (data.error) {
+            alert(data.error);
+        }
+    })
+    .catch((error) => {
+        alert(error);
+    });
+}
+
+        
+        function biosVersionExists(biosVersion) {
+            var existingBiosVersions = [];
+            table.rows().data().each(function(value, index) {
+                existingBiosVersions.push(value[0]);
+            });
+            return existingBiosVersions.includes(biosVersion);
+        }
+        
+        </script>
+        
+
+
+
+</body>
+
+{% include 'footer.html' %}
+</html>
+
+<style>
+.content {
+    flex: 1;
+}
+
+.container {
+    min-height: calc(100% - 100px); 
+    padding-bottom: 60px; 
+    max-width: 90%; 
+}   
+
+    #outputTable {
+        width: 100%;
+        overflow-x: auto;
+        border-collapse: collapse;
+        margin-top: 20px !important;
+    }
+
+    #outputTable th,
+    #outputTable td {
+        border: 1px solid #ddd; 
+        padding: 8px;
+        text-align: left; 
+        white-space: nowrap;
+    }
+
+
+    #outputTable th {
+        background-color: #b5e4f5; 
+    }
+
+    #outputTable tbody tr:hover {
+        background-color: #f6f6f6;
+    }
+
+    .dataTables_length label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .dataTables_length label > select {
+        margin-left: 8px;  
+        margin-right: 8px; 
+    }
+
+    #addTaskReportBtn {
+        position: relative;
+        margin-bottom: -35px;
+        float: left;
+        z-index: 1;
+    }
+
+    div.dataTables_wrapper div.dataTables_filter label {
+        font-weight: normal;
+        white-space: nowrap;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+    .form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+}
+
+#taskReportForm {
+    padding: 15px;
+}
+
+.submit-row {
+    display: flex;
+    justify-content: center;
+}
+
+.submit-group {
+    flex: 0 0 auto; 
+}
+
+
+input.btn.btn-primary {
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.required-label::after {
+    content: " *";
+    color: red;
+}
+
+input.btn.btn-primary:hover {
+    background-color: #286090;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0; 
+    top: 0;    
+    width: 100%; 
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; 
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
+    position: relative; 
+    top: 53%; 
+    transform: translateY(-47%);
+}
+
+
+    .modal-content .close {
+        margin-left: auto;
+        color: #45454588; 
+        background-color: white; 
+        border: 0; 
+        padding: 0 10px; 
+        font-size: 1.5rem;
+        border-radius: 50%;
+        cursor: pointer; 
+        
+    }
+
+    .modal-content .close:hover {
+        background-color:  #dcdcdc;     
+    }
+
+    .gray-background {
+        background-color: #f2f2f2; 
+        padding: 2px 5px; 
+        margin-top: 10px;
+    }
+    
+    .form-control:disabled:hover {
+        cursor: not-allowed;
+    }
+
+</style>
+

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Case Prioritization</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">      
+        <!-- CSS -->
+        <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link href="https://cdn.datatables.net/searchpanes/2.2.0/css/searchPanes.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet" type="text/css" />
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>        
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>  
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+        <script src="https://cdn.datatables.net/searchpanes/2.2.0/js/dataTables.searchPanes.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    </head>
+<body class="d-flex flex-column" style="min-height: 100vh;">
+    
+    {% include 'navbar.html' %}
+    
+
+    <div class="content flex-grow-1" id="main">
+        
+        <div class="container-fluid">
+            <div class="row">
+
+            </div>  
+                              
+            <div class="dtsp-verticalContainer">
+                <div class="dtsp-verticalPanes"></div>
+                <div class="container">
+                        <table id="outputTable" cellspacing="0" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>BIOS Version</th>
+                                    <th>Test Case Number</th>
+                                    <th>Test Case Name</th>
+                                    <th>Result</th>
+                                    <th>Comment</th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog custom-modal-size" role="document">
+          <div class="modal-content">
+              <button type="button" class="close" style="margin-left: auto;" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            <div class="modal-body">
+
+            </div>
+          </div>
+        </div>
+    </div>
+
+<script>
+var currentPage = 1;
+var resultsPerPage = 10;
+var data;
+var totalRecords = 0;
+let datatableColumnSettings;
+let table;
+let columnVisibilityStates = [];
+
+
+$(document).ready(function(){
+    // $('#taskIdSelect, #projectSelect, #phaseSelect, #categorySelect, #caseTitleSelect').select2({ width: 'resolve' });
+    // $('#clearAllButton').click(clearAll);
+    $('#outputTable thead tr:eq(1) th').each(function(i) {
+        $('input', this).on('keyup change', function() {
+            if (table.column(i).search() !== this.value) {
+                table.column(i).search(this.value).draw();
+            }
+        });
+    });
+    executeQuery(); 
+});
+
+
+var config = { childList: true, subtree: true };
+
+
+function captureColumnSettings(table) {
+    let columnSettings = table.columns().eq(0).map(function(index) {
+        let column = table.column(index);
+        return {
+            visible: column.visible(),
+            className: $(column.header()).attr('class'),
+            width: $(column.header()).css('width')
+        };
+    }).toArray();
+    localStorage.setItem('datatableColumnSettings', JSON.stringify(columnSettings));
+}
+
+function getVisibleColumnsAsString() {
+    var visibleColumns = table.columns(':visible').header().toArray().map(function(header) {
+        return '`' + $(header).text() + '`';
+    });
+    
+    return visibleColumns.join(', ');
+}
+
+function executeQuery() {
+    if (typeof table === 'undefined') {
+        selectedColumnsString = "`ID`, `BIOS Version`, `Test Case Number`, `Test Case Name`, `Result`, `Comment`";
+    } else {
+        selectedColumnsString = getVisibleColumnsAsString();
+    }
+
+    selectedColumnsString = "`BIOS Version`, `Test Case Number`, `Test Case Name`, `Result`, `Comment`";
+
+    var sqlQuery = `SELECT ${selectedColumnsString} FROM def`
+
+
+    fetch('/execute_query', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({query: sqlQuery}),
+    })
+    .then(response => response.json())
+    .then(responseData => {
+    
+        if (!responseData || !Array.isArray(responseData.result)) {
+            console.error("Response data is not defined or is not an array.");
+            return;
+        }
+        data = responseData.result; 
+        totalRecords = data.length; 
+        initializeDataTable();
+    })
+    
+
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+}
+
+function initializeDataTable() {
+    let savedSettings = localStorage.getItem('datatableColumnSettings');
+    let columnSettings = savedSettings ? JSON.parse(savedSettings) : [];
+    table = $('#outputTable').DataTable({
+        "destroy": true, 
+        "data": data,
+        "processing" : true,        
+        "columns": [
+            {   
+                orderable: false,
+                className: 'select-checkbox noVis',
+                targets: -1,
+                render: function (data, type, full, meta) {
+                    return '<input type="checkbox" class="my-custom-checkbox" />';
+                }
+            },     
+            { "data": 0}, 
+            { "data": 1}, 
+            { "data": 2}, 
+            { "data": 3}, //Result
+            { "data": 4
+            }, 
+        ],
+        "columnDefs": [ 
+        { 
+            searchPanes: {
+                header: 'High Priority Test Cases',
+                controls: false,
+                options: [
+                    {
+                        label: 'Failed Test Cases',
+                        value: function(rowData) {
+                            return rowData[3] == ('Fail' || 'fail');
+                        }
+                    }
+                ]
+            },
+            targets: [4]
+        }
+        
+    ],
+        "select": {
+            style:    'multi',
+            selector: 'td.select-checkbox',
+        },
+        "order": [1, 'asc'],
+        "paging": true, 
+        "pagingType": "full_numbers",
+        "info": true, 
+        "searching": true, 
+        "ordering": true, 
+        "language": {
+            "lengthMenu": "Show _MENU_ items",
+            "info": "Showing _START_ to _END_ of _TOTAL_ items",
+            "paginate": {
+                next: '<i class="fas fa-angle-right"></i>',
+                previous: '<i class="fas fa-angle-left"></i>',
+                first: '<i class="fas fa-angle-double-left"></i>',
+                last: '<i class="fas fa-angle-double-right"></i>'
+              }
+        },
+        "scrollX": true,
+        "scrollY": "600px",
+        "searchPanes": {
+            //initCollapsed: true,
+            show: true,
+            cascadePanes: true,
+            orderable: false,
+            layout: 'columns-1',
+            columns: [4, 1, 2],  
+            i18n: {
+                title: '<i class="fa-solid fa-filter"></i>'+'Filters',
+                clearMessage: '<i class="fa-solid fa-eraser"></i>',
+                showMessage: '<i class="fa-solid fa-arrow-down-short-wide"></i>',
+                collapseMessage: '<i class="fa-solid fa-arrow-up-short-wide"></i>',
+            },        
+        },
+        "dom": 
+        '<"dtsp-dataTable"' +
+        '<"top"P>' +
+        '<Bf>' +
+        'rt' +
+        '<"bottom"<"row"<"col-md-10"i><"col-md-1"l>>>' +
+        '<"row"<"col-12"p>>' +
+        '<"clear">' +
+        '>',
+    
+        "buttons": [
+            {
+                extend: 'colvis',
+                text: 'Display Columns',
+                columns: ':not(.noVis)',
+                className: 'custom-colvis-button',
+                collectionLayout: 'fixed columns',
+                collectionLayout: "fixed four-column",
+                prefixButtons: [
+                {
+                    extend: "colvisGroup",
+                    text:
+                    '<span><i class="fas fa-check-double"></i></span>Show all',
+                    className: "show-all",
+                    show: ":hidden"
+                },
+                {
+                    extend: "colvisGroup",
+                    text:
+                    '<span><i class="fas fa-eye-slash"></i></span>Hide all',
+                    className: "hide-all",
+                    hide: ":visible"
+                }
+                ]          
+            },
+            {
+                extend: 'excelHtml5',
+                className: 'custom-excel-button',
+                text: 'Excel',
+                exportOptions: {
+                   columns: ':visible'
+               },
+                action: function (e, dt, button, config) {
+                    var today = new Date();
+                    var formattedDate = today.getFullYear() + '-' + (today.getMonth() + 1).toString().padStart(2, '0') + '-' + today.getDate().toString().padStart(2, '0');
+                    var defaultFileName = "Test Case Prioritization-" + formattedDate;
+            
+                    swal({
+                        title: "Export to Excel",
+                        text: "Please enter a name for the Excel file:",
+                        content: {
+                            element: "input",
+                            attributes: {
+                                value: defaultFileName,
+                            },
+                        },
+                        buttons: ["Cancel", "Export"],
+                        closeOnClickOutside: true 
+                    }).then((value) => {
+                        if (value !== null) { 
+                            config.filename = value ? value : defaultFileName; 
+                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                        }
+                    });
+                }
+             }
+        ],
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], 
+        "pageLength": 15, 
+        "pageResize": true,
+        "initComplete": function(settings, json) {
+            this.api().columns().every(function(index) {
+                let column = this;
+                let settings = columnSettings[index] || {};
+                column.visible(settings.visible, false);
+                $(column.header()).addClass(settings.className);
+                $(column.header()).css('width', settings.width);
+            });
+            this.api().columns.adjust().draw(false);
+        }
+    });
+    
+    $("div.dtsp-verticalPanes").append(table.searchPanes.container());
+    
+    table.searchPanes.resizePanes()
+    $('#outputTable tbody').on('click', 'td.ellipsis-cell', function() {
+        var cellData = table.cell(this).data();
+        if (cellData !== null && cellData !== '') {
+            $('#exampleModal .modal-body').text(cellData);
+            $('#exampleModal').modal('show');
+        }
+    }); 
+}
+
+</script>
+
+</body>
+{% include 'footer.html' %}
+</html>
+

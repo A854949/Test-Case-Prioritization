@@ -40,14 +40,13 @@
         {% include 'navbar.html' %}
         <div class="container">
             <div class="selection-area">
-                <h4 class="title"><b>Select Task ID you want to compare</b></h4>
-                <select id="task-id-select" multiple>
-                    {% for task_id in task_ids %}
-                        <option value="{{ task_id['Task ID'] }}">{{ task_id['Task ID'] }}</option>
+                <h4 class="title"><b>Select BIOS Version you want to compare</b></h4>
+                <select id="bios-version-select" multiple>
+                    {% for bios_version in bios_versions %}
+                        <option value="{{ bios_version['BIOS Version'] }}">{{ bios_version['BIOS Version'] }}</option>
                     {% endfor %}
                 </select>
             </div>
-        
                 <div id="summary-table-container">
                     <!-- Summary table will be generated here -->
                 </div>
@@ -80,9 +79,8 @@
         $(document).ready(function() {
             var dataTableInstance = null;  // 用來追踪 DataTable 實例
 
-            // Initialize select2 on the task-id-select element
-            $('#task-id-select').select2({
-                placeholder: "Select Task ID",
+            $('#bios-version-select').select2({
+                placeholder: "Select BIOS Version",
                 allowClear: true,
                 width: '100%',
             })
@@ -103,18 +101,18 @@
     }
 
     // 更改事件处理程序，以在 AJAX 成功后调用 initializeDataTable
-    $('#task-id-select').on('change', function() {
-        var taskIds = $(this).val();
+    $('#bios-version-select').on('change', function() {
+        var biosVersions = $(this).val();
         $('#summary-table-container').empty();
         $('#summary-highlight-container').empty();
-        if (taskIds.length > 0) {
+        if (biosVersions.length > 0) {
             $.ajax({
-                url: '/get-sit-test-cases',
+                url: '/get-bios-test-cases',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({taskIds: taskIds}),
+                data: JSON.stringify({biosVersions: biosVersions}),
                 success: function(response) {
-                    generateSummaryTable(taskIds, response);
+                    generateSummaryTable(biosVersions, response);
                 },
                 error: function(error) {
                     console.error("加載測試用例出錯: ", error);
@@ -127,71 +125,77 @@
     });
 });
     
-    function generateSummaryTable(taskIds, data) {
+    function generateSummaryTable(biosVersions, data) {
     var container = $('#summary-table-container');
     var summaryContainer = $('#summary-highlight-container'); // 新增一個容器來存放摘要表格
     container.empty(); // 清空容器
     summaryContainer.empty(); // 清空摘要容器
 
     if (data.length > 0) {
-        var table = '<table id="summary-table" class="table table-striped table-hover"><thead><tr><th>Case Title</th>';
-        var summaryTable = '<table class="table table-striped table-hover"><thead><tr><th>Case Title</th>'; // 新增一個變數來存放摘要表格的 HTML
-        taskIds.forEach(function(taskId) {
-            table += '<th>' + taskId + '</th>';
-            summaryTable += '<th>' + taskId + '</th>'; // 為摘要表格添加表頭
+        var table = '<table id="summary-table" class="table table-striped table-hover"><thead><tr><th>Test Case Number</th><th>Test Case Name</th>';
+        var summaryTable = '<table class="table table-striped table-hover"><thead><tr><th>Test Case Number</th><th>Test Case Name</th>'; // 新增一个变量来存放摘要表格的 HTML
+        biosVersions.forEach(function(biosVersion) {
+            table += '<th>' + biosVersion + '</th>';
+            summaryTable += '<th>' + biosVersion + '</th>'; // 为摘要表格添加表头
         });
         table += '</tr></thead><tbody>';
-        summaryTable += '</tr></thead><tbody>'; // 結束摘要表格的表頭
+        summaryTable += '</tr></thead><tbody>'; // 结束摘要表格的表头
+
 
         var resultsByCaseTitleAndTaskId = {};
         data.forEach(function(item) {
-            var fullCaseTitle = item['Case Title'];
-            var taskId = item['Task ID'];
+            var fullCaseTitle = item['Test Case Name'];
+            var biosVersion = item['BIOS Version'];
             if (!resultsByCaseTitleAndTaskId[fullCaseTitle]) {
                 resultsByCaseTitleAndTaskId[fullCaseTitle] = {};
             }
-            resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] = item;
+            resultsByCaseTitleAndTaskId[fullCaseTitle][biosVersion] = item;
         });
 
         Object.keys(resultsByCaseTitleAndTaskId).forEach(function(fullCaseTitle) {
-            table += '<tr><td>' + fullCaseTitle.split('(')[0].trim() + '</td>';
-            var hasFail = taskIds.some(function(taskId) {
-                var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
-                var result = (item['Pass/Fail'] || '').toLowerCase();
+            var caseData = resultsByCaseTitleAndTaskId[fullCaseTitle];
+            var firstItem = caseData[Object.keys(caseData)[0]]; // 获取第一个条目以提取通用信息，比如 Test Case Number
+            table += `<tr><td>${firstItem['Test Case Number'] || '-'}</td><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
+            var hasFail = biosVersions.some(function(biosVersion) {
+                var item = caseData[biosVersion] || {};
+                var result = (item['Result'] || '').toLowerCase();
                 return result === 'fail' || result === 'NA' || result === '';
             });
             var highlight = hasFail ? ' style="background-color: #FFFCCC;"' : '';
-            taskIds.forEach(function(taskId) {
-                var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
-                var result = item['Pass/Fail'] || '-';
+            biosVersions.forEach(function(biosVersion) {
+                var item = caseData[biosVersion] || {};
+                var result = item['Result'] || '-';
                 table += `<td${highlight}><a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a></td>`;
             });
             table += '</tr>';
             if (hasFail) {
-                // 只有當該行包含 "fail" 結果時，才將其添加到摘要表格中
-                summaryTable += '<tr' + highlight + '><td>' + fullCaseTitle.split('(')[0].trim() + '</td>';
-                taskIds.forEach(function(taskId) {
-                    var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
-                    var result = item['Pass/Fail'] || '-';
+                summaryTable += `<tr${highlight}><td>${firstItem['Test Case Number'] || '-'}</td><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
+                biosVersions.forEach(function(biosVersion) {
+                    var item = caseData[biosVersion] || {};
+                    var result = item['Result'] || '-';
                     summaryTable += `<td>${result}</td>`;
                 });
                 summaryTable += '</tr>';
             }
         });
 
+
         table += '</tbody></table>';
-        summaryTable += '</tbody></table>'; 
+        summaryTable += '</tbody></table>'; // 結束摘要表格的 HTML
         container.append(table);
-        summaryContainer.append(summaryTable); 
-        if ($.fn.DataTable.isDataTable('#summary-table')) {
+        summaryContainer.append(summaryTable); // 將摘要表格添加到摘要容器中
+   // Check if a DataTable instance already exists
+if ($.fn.DataTable.isDataTable('#summary-table')) {
+            // If it does, destroy it
             $('#summary-table').DataTable().destroy();
         }
+        // Initialize a new DataTable instance
         $('#summary-table').DataTable({
             searching: true,
             autoWidth: true,
             info: true,
             paging: true,
-            order: [], 
+            order: [], // Default no ordering
             language: {
                 search: "Search Test Cases:"
             }
@@ -201,8 +205,6 @@
         summaryContainer.append('<p>No highlighted test cases found.</p>'); // 如果沒有高亮的測試案例，顯示相應的信息
     }
 }
-
-
 
 
 
@@ -224,16 +226,16 @@ $(document).on('click', '.result-link', function() {
     modalBody.append(table); // 將表格添加到模態框的主體中
 });
 
-$('#task-id-select').on('change', function() {
-    var taskIds = $(this).val();
-    if (taskIds.length > 0) {
+$('#bios-version-select').on('change', function() {
+    var biosVersions = $(this).val();
+    if (biosVersions.length > 0) {
         $.ajax({
-            url: '/get-sit-test-cases',
+            url: '/get-bios-test-cases',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({taskIds: taskIds}),
+            data: JSON.stringify({biosVersions: biosVersions}),
             success: function(response) {
-                generateSummaryTable(taskIds, response);
+                generateSummaryTable(biosVersions, response);
             },
             error: function(error) {
                 console.log(error);
@@ -266,7 +268,7 @@ $('#task-id-select').on('change', function() {
 
     #summary-table-container {
         margin-top: 20px;
-        max-height: 600px;
+        max-height: 400px;
         overflow-y: auto; 
     }
 
@@ -286,15 +288,14 @@ $('#task-id-select').on('change', function() {
     }
     .modal-backdrop {
         opacity: 0.3 !important;
-    }
-    .select2-container--default .select2-search--inline .select2-search__field {
-        justify-content: center !important;
-    }
-    .selection-area {
+}
+.select2-container--default .select2-search--inline .select2-search__field {
+    justify-content: center !important;
+}
+.selection-area {
         background-color: #c2e6f3;
         padding: 20px;
-        border-radius: 8px; /* 這會給元素添加圓角效果 */
+        border-radius: 8px;
     }
-
 </style>
 
