@@ -52,7 +52,7 @@
                     <!-- Summary table will be generated here -->
                 </div>
                 <br>
-                <h4 class="title"><b>Summary</b></h4>
+                <h4 class="title"><b>Comparison Summary</b></h4>
                 <div id="summary-highlight-container">
 
                 </div>
@@ -113,21 +113,21 @@
     });
 });
     
-    function generateSummaryTable(taskIds, data) {
+function generateSummaryTable(taskIds, data) {
     var container = $('#summary-table-container');
-    var summaryContainer = $('#summary-highlight-container'); // 新增一個容器來存放摘要表格
-    container.empty(); // 清空容器
-    summaryContainer.empty(); // 清空摘要容器
+    var summaryContainer = $('#summary-highlight-container');
+    container.empty();
+    summaryContainer.empty();
 
     if (data.length > 0) {
         var table = '<table id="summary-table" class="table table-striped table-hover"><thead><tr><th>Case Title</th>';
-        var summaryTable = '<table id="summary-highlight-table" class="table table-striped table-hover"><thead><tr><th>Case Title</th>'; 
+        var summaryTable = '<table id="summary-highlight-table" class="table table-striped table-hover"><thead><tr><th>Case Title</th>';
         taskIds.forEach(function(taskId) {
             table += '<th>' + taskId + '</th>';
-            summaryTable += '<th>' + taskId + '</th>'; // 為摘要表格添加表頭
+            summaryTable += '<th>' + taskId + '</th>';
         });
         table += '</tr></thead><tbody>';
-        summaryTable += '</tr></thead><tbody>'; // 結束摘要表格的表頭
+        summaryTable += '</tr></thead><tbody>';
 
         var resultsByCaseTitleAndTaskId = {};
         data.forEach(function(item) {
@@ -140,77 +140,76 @@
         });
 
         Object.keys(resultsByCaseTitleAndTaskId).forEach(function(fullCaseTitle) {
-            table += '<tr><td>' + fullCaseTitle.split('(')[0].trim() + '</td>';
             var hasFail = taskIds.some(function(taskId) {
                 var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
                 var result = (item['Pass/Fail'] || '').toLowerCase();
                 return result === 'fail' || result === 'NA' || result === '';
             });
             var highlight = hasFail ? ' style="background-color: #FFFCCC;"' : '';
+
+            table += `<tr><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
+            if (hasFail) { // Add rows to the summary table for failed cases without highlight
+                summaryTable += `<tr><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
+            }
+
             taskIds.forEach(function(taskId) {
                 var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
                 var result = item['Pass/Fail'] || '-';
-                table += `<td${highlight}><a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a></td>`;
+                var link = `<a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a>`;
+                table += `<td${highlight}>${link}</td>`;
+                if (hasFail) {
+                    summaryTable += `<td>${link}</td>`; // Add plain data without highlight
+                }
             });
+
             table += '</tr>';
             if (hasFail) {
-                // 只有當該行包含 "fail" 結果時，才將其添加到摘要表格中
-                summaryTable += '<tr' + highlight + '><td>' + fullCaseTitle.split('(')[0].trim() + '</td>';
-                taskIds.forEach(function(taskId) {
-                    var item = resultsByCaseTitleAndTaskId[fullCaseTitle][taskId] || {};
-                    var result = item['Pass/Fail'] || '-';
-                    summaryTable += `<td>${result}</td>`;
-                });
                 summaryTable += '</tr>';
             }
         });
 
         table += '</tbody></table>';
-        summaryTable += '</tbody></table>'; 
+        summaryTable += '</tbody></table>';
         container.append(table);
-        summaryContainer.append(summaryTable); 
-        if ($.fn.DataTable.isDataTable('#summary-table')) {
-            $('#summary-table').DataTable().destroy();
-        }
-        if ($.fn.DataTable.isDataTable('#summary-highlight-table')) {
-            $('#summary-highlight-table').DataTable().destroy();
-        }
-        $('#summary-table').DataTable({
-            searching: true,
-            autoWidth: true,
-            info: true,
-            paging: true,
-            order: [], 
-            language: {
-                search: "Search Test Cases:",
-                lengthMenu: "Show _MENU_ items",
-                info: "Showing _START_ to _END_ of _TOTAL_ items",
-                paginate: {
+        summaryContainer.append(summaryTable);
+
+        reinitializeDataTables('#summary-table', 'Search:', true);
+        reinitializeDataTables('#summary-highlight-table', 'Search:', false);
+    } else {
+        container.append('<p>No test cases found.</p>');
+        summaryContainer.append('<p>No highlighted test cases found.</p>');
+    }
+}
+
+function reinitializeDataTables(tableId, searchPlaceholder) {
+    if ($.fn.DataTable.isDataTable(tableId)) {
+        $(tableId).DataTable().destroy();
+    }
+
+    // 基础配置
+    var dataTableOptions = {
+        searching: true,
+        autoWidth: true,
+        info: true,
+        paging: true,
+        order: [],
+        language: {
+            search: searchPlaceholder,
+            lengthMenu: "Show _MENU_ items",
+            info: "Showing _START_ to _END_ of _TOTAL_ items",
+            paginate: {
                 next: '<i class="fas fa-angle-right"></i>',
                 previous: '<i class="fas fa-angle-left"></i>',
                 first: '<i class="fas fa-angle-double-left"></i>',
                 last: '<i class="fas fa-angle-double-right"></i>'
             }
-            },
-        });
-        $('#summary-highlight-table').DataTable({
-            searching: true,
-            autoWidth: true,
-            info: true,
-            paging: true,
-            order: [],
-            language: {
-                search: "Search Test Cases:",
-                lengthMenu: "Show _MENU_ items",
-                info: "Showing _START_ to _END_ of _TOTAL_ items",
-                paginate: {
-                next: '<i class="fas fa-angle-right"></i>',
-                previous: '<i class="fas fa-angle-left"></i>',
-                first: '<i class="fas fa-angle-double-left"></i>',
-                last: '<i class="fas fa-angle-double-right"></i>'
-            }
-            },
-            buttons: [
+        }
+    };
+
+    // 如果是摘要表格，添加 Excel 导出按钮
+    if (tableId === '#summary-highlight-table') {
+        dataTableOptions.dom = 'Bfrtip';  // Enable buttons and other elements
+        dataTableOptions.buttons = [
             {
                 extend: 'excelHtml5',
                 className: 'custom-excel-button',
@@ -242,18 +241,12 @@
                     });
                 }
              }
-            ],
-            dom:'Bfrtip',
-        });
-    } else {
-        container.append('<p>No test cases found.</p>');
-        summaryContainer.append('<p>No highlighted test cases found.</p>'); // 如果沒有高亮的測試案例，顯示相應的信息
+        ];
     }
+
+    // 初始化 DataTables
+    $(tableId).DataTable(dataTableOptions);
 }
-
-
-
-
 
 $(document).on('click', '.result-link', function() {
     var item = $(this).data('item');
@@ -342,7 +335,7 @@ $('#task-id-select').on('change', function() {
     .selection-area {
         background-color: #c2e6f3;
         padding: 20px;
-        border-radius: 8px; /* 這會給元素添加圓角效果 */
+        border-radius: 8px; 
     }
     .custom-excel-button {
         background-color: #5cb85c !important;

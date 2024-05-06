@@ -340,7 +340,25 @@ function uploadFile(formData) {
             });
             return existingBiosVersions.includes(biosVersion);
         }
-        
+        document.getElementById('file').addEventListener('change', function() {
+    // 如果是编辑模式，则不执行任何操作
+    if (currentMode === 'edit') {
+        return;  // 直接返回，不进行任何操作
+    }
+
+    var file = this.files[0]; 
+    if (file) {
+        var filename = file.name;
+        var newBiosVersion = filename.substring(0, filename.lastIndexOf('.')) || filename;
+        var currentBiosVersion = document.getElementById('biosVersion').value;
+
+        // 仅在非编辑模式下，如果新BIOS版本与当前版本不同，才更新
+        if (newBiosVersion !== currentBiosVersion) {
+            document.getElementById('biosVersion').value = newBiosVersion;
+        }
+    }
+});
+
         </script>
         
 

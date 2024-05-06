@@ -21,16 +21,16 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContents">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="testCaseDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Test Case
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <li><a class="dropdown-item" href="{{ url_for('index') }}">SIT</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('index_bios') }}">BIOS</a></li>
+                        <ul class="dropdown-menu" aria-labelledby="testCaseDropdownMenuLink">
+                            <li><a class="dropdown-item" href="{{ url_for('test_case_sit') }}">SIT</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('test_case_bios') }}">BIOS</a></li>
                         </ul>
                     </li> 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="addTaskReportDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Add Task Report
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -108,10 +108,15 @@
                 }
             }
         });
+        if (currentUrl.includes('/test_case_sit') || currentUrl.includes('/test_case_bios')) {
+            // 將 "Add Task Report" 選項設置為粗體
+            $('#testCaseDropdownMenuLink').addClass('active');
+        }
+
         // 檢查是否選擇了 "Add Task Report" 下的 "SIT" 或 "BIOS"
         if (currentUrl.includes('/task_report_sit') || currentUrl.includes('/task_report_bios')) {
             // 將 "Add Task Report" 選項設置為粗體
-            $('#navbarDropdownMenuLink').addClass('active');
+            $('#addTaskReportDropdownMenuLink').addClass('active');
         }
 
         // 檢查是否選擇了 "Comparison" 下的 "SIT" 或 "BIOS"

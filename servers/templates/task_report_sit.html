@@ -202,7 +202,7 @@
         
         document.getElementById('taskReportForm').onsubmit = function(e) {
             e.preventDefault();
-        
+
             var taskData = {
                 taskId: document.getElementById('taskId').value,
                 taskTitle: document.getElementById('taskTitle').value,
@@ -211,14 +211,14 @@
                 endDate: document.getElementById('endDate').value
             };
         
-            var url = currentMode === 'add' ? 'http://15.34.25.120:5010/task_report_sit' : 'http://15.34.25.120:5010/edit_task_sit';
+        var url = currentMode === 'add' ? 'http://15.34.25.120:5010/task_report_sit' : 'http://15.34.25.120:5010/edit_task_sit';
         var method = 'POST';
 
         if (currentMode === 'edit') {
             taskData.taskId = document.getElementById('taskId').value;
         }
 
-        fetch(url, {
+    fetch(url, {
     method: method,
     headers: {
         'Content-Type': 'application/json'
@@ -383,6 +383,31 @@ function uploadFile(formData) {
             });
             return existingTaskIds.includes(taskId);
         }
+        document.getElementById('file').addEventListener('change', function() {
+            if (currentMode === 'edit') {
+        return;  // 直接返回，不进行任何操作
+    }
+    var file = this.files[0];
+    if (file) {
+        var filename = file.name;
+        // 假设 "matrix" 后面跟随的是TaskID，且 "matrix" 是文件名中的一个标识符
+        var index = filename.toLowerCase().indexOf('martrix');
+        if (index !== -1) {
+            // 提取 "matrix" 之后的所有字符作为 TaskID
+            var taskId = filename.substring(index + 'martrix'.length).trim();
+            // 如果文件名以数字或其他标识符结束，可以进一步处理taskId来适应格式
+            // 例如，如果taskId包含文件扩展名，需要去掉
+            if (taskId.lastIndexOf('.') !== -1) {
+                taskId = taskId.substring(0, taskId.lastIndexOf('.'));
+            }
+            // 设置 TaskID 输入框的值
+            document.getElementById('taskId').value = taskId;
+        } else {
+            alert('Filename does not contain the identifier "martrix". Please check the file name.');
+        }
+    }
+});
+
         
         </script>
         

@@ -3,7 +3,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from flask_bcrypt import Bcrypt
 import os
-import parser1, parser2, parser3
+import parser1, parser2, parser3, parser4
 import csv
 import pymysql
 import mysql.connector
@@ -45,6 +45,10 @@ def health():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/test_case_sit', methods=['GET', 'POST'], endpoint='test_case_sit')
+def index_sit():
+    return render_template('test_case_sit.html')
 
 
 class RegistrationForm(FlaskForm):
@@ -394,21 +398,22 @@ def insert_data_into_mysql_sit(csv_file_path):
     conn.close()
 
 #BIOS       
-@app.route('/index_bios')
+@app.route('/test_case_bios', methods=['GET', 'POST'], endpoint='test_case_bios')
 def index_bios():
-    return render_template('index_bios.html')
+    return render_template('/test_case_bios.html')
  
 @app.route('/task_report_bios', methods=['GET', 'POST'])
 def task_report_bios():
     if not session.get('username'):
         flash('Please log in to access this page.', 'warning')
         return redirect(url_for('login'))
+
     if request.method == 'GET':
         return render_template('task_report_bios.html')
     elif request.method == 'POST':
         try:
             data = request.get_json()
-            bios_version = data.get('biosVersion')
+            raw_bios_version = data.get('biosVersion', '').replace('_', ' ')  # Replace underscores with spaces
             creator = session.get('username')
             created_at = datetime.now().strftime('%Y/%m/%d %H:%M')
             insert_sql = """
@@ -416,15 +421,14 @@ def task_report_bios():
             VALUES (%s, %s, %s)
             """
 
-            conn = pymysql.connect(**db_config)
+            conn = pymysql.connect(**db_config)  # Ensure db_config is defined somewhere in your app
             with conn.cursor() as cursor:
-                cursor.execute(insert_sql, (bios_version, creator, created_at))
+                cursor.execute(insert_sql, (raw_bios_version, creator, created_at))
                 conn.commit()
 
             return jsonify({'message': 'Task report added successfully'})
 
         except IntegrityError as e:
-
             if e.args[0] == 1062:
                 return jsonify({'error': 'BIOS Version already exists.'}), 400
             else:
@@ -539,8 +543,12 @@ def upload_and_process_bios():
         file.save(filepath)
 
         final_output_path = 'C:/Users/Mika Shih/Desktop/testcasedb_UAT/servers/final_output.csv'
-
-        parser3.process_file(filepath, final_output_path)
+        
+        # 根据文件名选择不同的解析器
+        if 'PreRelease' in filename:
+            parser4.process_file(filepath, final_output_path)
+        else:
+            parser3.process_file(filepath, final_output_path)
 
         insert_data_into_mysql_bios(final_output_path)
 
@@ -584,15 +592,23 @@ def comparison_bios():
 
 @app.route('/get-bios-test-cases', methods=['POST'])
 def get_bios_test_cases():
-    bios_versions = request.json.get('biosVersions', [])
+    raw_bios_versions = request.json.get('biosVersions', [])
+    # 清理每个版本号，将下划线替换为空格
+    bios_versions = [version.strip().replace('_', ' ') for version in raw_bios_versions]
+    print("Processed BIOS versions:", bios_versions)  # 打印查看处理后的数据
+
+    if not bios_versions:
+        return jsonify([])  # 如果列表为空，直接返回空列表
+
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
+    # 构建 SQL 查询
+    format_strings = ','.join(['%s'] * len(bios_versions))
     query = """
     SELECT `BIOS Version`, `Test Case Number`, `Test Case Name`, `Result`, `Comment`
     FROM def WHERE `BIOS Version` IN (%s)
     """
-    format_strings = ','.join(['%s'] * len(bios_versions))
     cursor.execute(query % format_strings, tuple(bios_versions))
 
     results = cursor.fetchall()

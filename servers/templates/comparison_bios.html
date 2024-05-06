@@ -51,7 +51,7 @@
                     <!-- Summary table will be generated here -->
                 </div>
                 <br>
-                <h4 class="title"><b>Summary</b></h4>
+                <h4 class="title"><b>Comparison Summary</b></h4>
                 <div id="summary-highlight-container">
 
                 </div>
@@ -111,109 +111,103 @@
     });
 });
     
-    function generateSummaryTable(biosVersions, data) {
+function generateSummaryTable(biosVersions, data) {
     var container = $('#summary-table-container');
-    var summaryContainer = $('#summary-highlight-container'); // 新增一個容器來存放摘要表格
-    container.empty(); // 清空容器
-    summaryContainer.empty(); // 清空摘要容器
+    var summaryContainer = $('#summary-highlight-container');
+    container.empty();
+    summaryContainer.empty();
 
     if (data.length > 0) {
         var table = '<table id="summary-table" class="table table-striped table-hover"><thead><tr><th>Test Case Number</th><th>Test Case Name</th>';
-        var summaryTable = '<table id="summary-highlight-table" class="table table-striped table-hover"><thead><tr><th>Test Case Number</th><th>Test Case Name</th>'; 
+        var summaryTable = '<table id="summary-highlight-table" class="table table-striped table-hover"><thead><tr><th>Test Case Number</th><th>Test Case Name</th>';
         biosVersions.forEach(function(biosVersion) {
             table += '<th>' + biosVersion + '</th>';
-            summaryTable += '<th>' + biosVersion + '</th>'; // 为摘要表格添加表头
+            summaryTable += '<th>' + biosVersion + '</th>';
         });
         table += '</tr></thead><tbody>';
-        summaryTable += '</tr></thead><tbody>'; // 结束摘要表格的表头
+        summaryTable += '</tr></thead><tbody>';
 
-
-        var resultsByCaseTitleAndTaskId = {};
+        var resultsByTestCase = {};
         data.forEach(function(item) {
-            var fullCaseTitle = item['Test Case Name'];
+            var testCaseName = item['Test Case Name'];
             var biosVersion = item['BIOS Version'];
-            if (!resultsByCaseTitleAndTaskId[fullCaseTitle]) {
-                resultsByCaseTitleAndTaskId[fullCaseTitle] = {};
+            if (!resultsByTestCase[testCaseName]) {
+                resultsByTestCase[testCaseName] = {};
             }
-            resultsByCaseTitleAndTaskId[fullCaseTitle][biosVersion] = item;
+            resultsByTestCase[testCaseName][biosVersion] = item;
         });
 
-        Object.keys(resultsByCaseTitleAndTaskId).forEach(function(fullCaseTitle) {
-            var caseData = resultsByCaseTitleAndTaskId[fullCaseTitle];
-            var firstItem = caseData[Object.keys(caseData)[0]]; // 获取第一个条目以提取通用信息，比如 Test Case Number
-            table += `<tr><td>${firstItem['Test Case Number'] || '-'}</td><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
+        Object.keys(resultsByTestCase).forEach(function(testCaseName) {
+            var caseData = resultsByTestCase[testCaseName];
+            var firstItem = caseData[Object.keys(caseData)[0]];  // Assumes that 'Test Case Number' is the same across all versions
             var hasFail = biosVersions.some(function(biosVersion) {
                 var item = caseData[biosVersion] || {};
                 var result = (item['Result'] || '').toLowerCase();
                 return result === 'fail' || result === 'NA' || result === '';
             });
             var highlight = hasFail ? ' style="background-color: #FFFCCC;"' : '';
+
+            table += `<tr><td>${firstItem['Test Case Number'] || '-'}</td><td>${testCaseName}</td>`;
+            summaryTable += hasFail ? `<tr><td>${firstItem['Test Case Number'] || '-'}</td><td>${testCaseName}</td>` : "";
+
             biosVersions.forEach(function(biosVersion) {
                 var item = caseData[biosVersion] || {};
                 var result = item['Result'] || '-';
-                table += `<td${highlight}><a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a></td>`;
+                var link = `<a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a>`;
+                table += `<td${highlight}>${link}</td>`;
+                if (hasFail) {
+                    summaryTable += `<td>${link}</td>`;  // Include clickable link in summary table for failed items
+                }
             });
+
             table += '</tr>';
             if (hasFail) {
-                summaryTable += `<tr${highlight}><td>${firstItem['Test Case Number'] || '-'}</td><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
-                biosVersions.forEach(function(biosVersion) {
-                    var item = caseData[biosVersion] || {};
-                    var result = item['Result'] || '-';
-                    summaryTable += `<td>${result}</td>`;
-                });
                 summaryTable += '</tr>';
             }
         });
 
-
         table += '</tbody></table>';
-        summaryTable += '</tbody></table>'; // 結束摘要表格的 HTML
+        summaryTable += '</tbody></table>';
         container.append(table);
-        summaryContainer.append(summaryTable); // 將摘要表格添加到摘要容器中
-   // Check if a DataTable instance already exists
-        if ($.fn.DataTable.isDataTable('#summary-table')) {
-            $('#summary-table').DataTable().destroy();
-        }
-        if ($.fn.DataTable.isDataTable('#summary-highlight-table')) {
-            $('#summary-highlight-table').DataTable().destroy();
-        }
-        // Initialize a new DataTable instance
-        $('#summary-table').DataTable({
-            searching: true,
-            autoWidth: true,
-            info: true,
-            paging: true,
-            order: [], // Default no ordering
-            language: {
-                search: "Search Test Cases:",
-                lengthMenu: "Show _MENU_ items",
-                info: "Showing _START_ to _END_ of _TOTAL_ items",
-                paginate: {
+        summaryContainer.append(summaryTable);
+
+        reinitializeDataTables('#summary-table', 'Search:');
+        reinitializeDataTables('#summary-highlight-table', 'Search:');
+    } else {
+        container.append('<p>No test cases found.</p>');
+        summaryContainer.append('<p>No highlighted test cases found.</p>');
+    }
+}
+
+function reinitializeDataTables(tableId, searchPlaceholder) {
+    if ($.fn.DataTable.isDataTable(tableId)) {
+        $(tableId).DataTable().destroy();
+    }
+
+    // 基础配置
+    var dataTableOptions = {
+        searching: true,
+        autoWidth: true,
+        info: true,
+        paging: true,
+        order: [],
+        language: {
+            search: searchPlaceholder,
+            lengthMenu: "Show _MENU_ items",
+            info: "Showing _START_ to _END_ of _TOTAL_ items",
+            paginate: {
                 next: '<i class="fas fa-angle-right"></i>',
                 previous: '<i class="fas fa-angle-left"></i>',
                 first: '<i class="fas fa-angle-double-left"></i>',
                 last: '<i class="fas fa-angle-double-right"></i>'
             }
-            },
-        });
-        $('#summary-highlight-table').DataTable({
-            searching: true,
-            autoWidth: true,
-            info: true,
-            paging: true,
-            order: [],
-            language: {
-                search: "Search Test Cases:",
-                lengthMenu: "Show _MENU_ items",
-                info: "Showing _START_ to _END_ of _TOTAL_ items",
-                paginate: {
-                next: '<i class="fas fa-angle-right"></i>',
-                previous: '<i class="fas fa-angle-left"></i>',
-                first: '<i class="fas fa-angle-double-left"></i>',
-                last: '<i class="fas fa-angle-double-right"></i>'
-            }
-            },
-            buttons: [
+        }
+    };
+
+    // 如果是摘要表格，添加 Excel 导出按钮
+    if (tableId === '#summary-highlight-table') {
+        dataTableOptions.dom = 'Bfrtip';  // Enable buttons and other elements
+        dataTableOptions.buttons = [
             {
                 extend: 'excelHtml5',
                 className: 'custom-excel-button',
@@ -245,13 +239,11 @@
                     });
                 }
              }
-            ],
-            dom:'Bfrtip',
-        });
-    } else {
-        container.append('<p>No test cases found.</p>');
-        summaryContainer.append('<p>No highlighted test cases found.</p>'); // 如果沒有高亮的測試案例，顯示相應的信息
+        ];
     }
+
+    // 初始化 DataTables
+    $(tableId).DataTable(dataTableOptions);
 }
 
 
