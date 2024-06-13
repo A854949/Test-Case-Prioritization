@@ -40,7 +40,11 @@ This system is a Flask-based web application that provides test report managemen
 
    You should see the home page load.
 
-## Create Database and Tables (If setting up the server on another computer)
+## MySQL Database Setup
+
+Before running the server, make sure to set up the MySQL database with the necessary tables.
+
+### Create Database and Tables (If setting up the server on another computer)
 
 1. **Create Database**
 
@@ -116,3 +120,29 @@ This system is a Flask-based web application that provides test report managemen
        `Comment` TEXT,
        PRIMARY KEY (`UUID`)
    );
+
+   DELIMITER $$
+
+   CREATE TRIGGER before_insert_abc
+   BEFORE INSERT ON abc
+   FOR EACH ROW
+   BEGIN
+       IF NEW.UUID IS NULL OR NEW.UUID = '' THEN
+           SET NEW.UUID = UUID();
+       END IF;
+   END$$
+
+   DELIMITER ;
+   
+   DELIMITER $$
+
+   CREATE TRIGGER before_insert_def
+   BEFORE INSERT ON def
+   FOR EACH ROW
+   BEGIN
+       IF NEW.UUID IS NULL OR NEW.UUID = '' THEN
+           SET NEW.UUID = UUID();
+       END IF;
+   END$$
+
+   DELIMITER ;
