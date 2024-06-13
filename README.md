@@ -22,13 +22,25 @@ This system is a Flask-based web application that provides test report managemen
    In the opened `server.py` file, click the run button (with a play symbol) in the top-right corner.
 
    Upon successful execution, the terminal will display something like:
+   ```plaintext
    * Running on http://0.0.0.0:5010/ (Press CTRL+C to quit)
 		![image](https://github.com/A854949/TestCasePrioritization/assets/82749575/5499c0af-3eb3-4265-a819-107b1de64b3f)
 
-## Access the Web Pages
+### Access the Web Pages
+
+1. **Open Browser**
+
+   - Open your preferred web browser.
+
+2. **Access the Home Page**
+
+   - Enter the following URL in the address bar and visit:
+        ```plaintext
+   	* http://15.34.25.120:5010/
+	You should see the home page load.
 
 
-
+   	  
 CREATE TABLE testCase (
     `UUID` CHAR(36) NOT NULL,
     `Task ID` VARCHAR(20),
