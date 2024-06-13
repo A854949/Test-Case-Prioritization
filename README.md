@@ -24,7 +24,6 @@ This system is a Flask-based web application that provides test report managemen
    Upon successful execution, the terminal will display something like:
    ```plaintext
    * Running on http://0.0.0.0:5010/ (Press CTRL+C to quit)
-		![image](https://github.com/A854949/TestCasePrioritization/assets/82749575/5499c0af-3eb3-4265-a819-107b1de64b3f)
 
 ### Access the Web Pages
 
