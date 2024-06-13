@@ -40,11 +40,11 @@ This system is a Flask-based web application that provides test report managemen
 
    You should see the home page load.
 
-## MySQL Database Setup
+## MySQL Database Setup (If setting up the server on another computer)
 
 Before running the server, make sure to set up the MySQL database with the necessary tables.
 
-### Create Database and Tables (If setting up the server on another computer)
+### Create Database and Tables
 
 1. **Create Database**
 
