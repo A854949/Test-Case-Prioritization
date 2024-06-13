@@ -1,7 +1,5 @@
 # Test Case Prioritization Handover Document
-## System Overview
-
-This system is a Flask-based web application that provides test report management and comparison features, including user registration, login, task report creation, editing, deletion, and comparison.
+This system is a Flask-based web application that provides test report management, including user registration, login, task report creation, editing, deletion, and comparison.
 
 ## Startup Steps
 
