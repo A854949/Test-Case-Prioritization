@@ -61,8 +61,6 @@ Before running the server, make sure to set up the MySQL database with the neces
    ```sql
    USE test;
 
-   USE test;
-
    CREATE TABLE users (
        `UUID` CHAR(36) PRIMARY KEY NOT NULL,
        username VARCHAR(50) NOT NULL,
