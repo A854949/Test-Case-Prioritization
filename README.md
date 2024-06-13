@@ -40,7 +40,7 @@ This system is a Flask-based web application that provides test report managemen
 
    You should see the home page load.
 
-### Create Database and Tables (If setting up the server on another computer)
+## Create Database and Tables (If setting up the server on another computer)
 
 1. **Create Database**
 
@@ -48,7 +48,82 @@ This system is a Flask-based web application that provides test report managemen
    ```sql
    CREATE DATABASE test;
 
+2. **Create Tables**
 
+   Switch to the `test` database and create the required tables:
+
+   ```sql
+   USE test;
+
+USE test;
+
+CREATE TABLE users (
+    UUID VARCHAR(36) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    PRIMARY KEY (UUID)
+);
+
+CREATE TABLE taskReport (
+    `Task ID` VARCHAR(50) NOT NULL,
+    `Task Title` VARCHAR(100),
+    `Testing Site` VARCHAR(100),
+    `Start Date` DATE,
+    `End Date` DATE,
+    `Creator` VARCHAR(50),
+    `Created_at` DATETIME,
+    PRIMARY KEY (`Task ID`)
+);
+
+CREATE TABLE abc (
+    `UUID` VARCHAR(36) NOT NULL,
+    `Task ID` VARCHAR(50) NOT NULL,
+    `Case Title` VARCHAR(100),
+    `Pass/Fail` VARCHAR(10),
+    `Tester` VARCHAR(50),
+    `Platform Name` VARCHAR(50),
+    `SKU` VARCHAR(50),
+    `Hw Phase` VARCHAR(50),
+    `OBS` VARCHAR(50),
+    `Block Type` VARCHAR(50),
+    `File` VARCHAR(50),
+    `KAT/KUT` VARCHAR(50),
+    `RTA` VARCHAR(50),
+    `ATT/UAT` VARCHAR(50),
+    `Run Cycle` VARCHAR(50),
+    `Fail Cycle/Total Cycle` VARCHAR(50),
+    `Case Note` TEXT,
+    `Comments` TEXT,
+    `Component List` TEXT,
+    `Comment` TEXT,
+    `Category` VARCHAR(50),
+    PRIMARY KEY (`UUID`)
+);
+
+CREATE TABLE biosTaskReport (
+    `BIOS Version` VARCHAR(50) NOT NULL,
+    `Creator` VARCHAR(50),
+    `Created_at` DATETIME,
+    PRIMARY KEY (`BIOS Version`)
+);
+
+CREATE TABLE def (
+    `UUID` VARCHAR(36) NOT NULL,
+    `BIOS Version` VARCHAR(50) NOT NULL,
+    `Test Case Number` VARCHAR(50),
+    `Test Case Name` VARCHAR(100),
+    `Result` VARCHAR(50),
+    `Comment` TEXT,
+    PRIMARY KEY (`UUID`)
+);
+
+
+
+
+
+
+   
 CREATE TABLE testCase (
     `UUID` CHAR(36) NOT NULL,
     `Task ID` VARCHAR(20),
