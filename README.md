@@ -10,6 +10,7 @@ This system is a Flask-based web application that provides test report managemen
    - Navigate to the `testcasedb_UAT` project folder.
    - Right-click on the `testcasedb_UAT` folder.
    - Select "Open with Code" from the context menu.
+     
 ![image](https://github.com/A854949/TestCasePrioritization/assets/82749575/a77f9895-1aed-4c10-acde-577bb1f5b4eb)
 
 2. **Open `server.py` File**
