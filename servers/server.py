@@ -413,7 +413,7 @@ def task_report_bios():
     elif request.method == 'POST':
         try:
             data = request.get_json()
-            raw_bios_version = data.get('biosVersion', '').replace('_', ' ')  # Replace underscores with spaces
+            raw_bios_version = data.get('biosVersion', '').replace('_', ' ') 
             creator = session.get('username')
             created_at = datetime.now().strftime('%Y/%m/%d %H:%M')
             insert_sql = """
@@ -421,7 +421,7 @@ def task_report_bios():
             VALUES (%s, %s, %s)
             """
 
-            conn = pymysql.connect(**db_config)  # Ensure db_config is defined somewhere in your app
+            conn = pymysql.connect(**db_config)  
             with conn.cursor() as cursor:
                 cursor.execute(insert_sql, (raw_bios_version, creator, created_at))
                 conn.commit()
@@ -593,17 +593,15 @@ def comparison_bios():
 @app.route('/get-bios-test-cases', methods=['POST'])
 def get_bios_test_cases():
     raw_bios_versions = request.json.get('biosVersions', [])
-    # 清理每个版本号，将下划线替换为空格
     bios_versions = [version.strip().replace('_', ' ') for version in raw_bios_versions]
-    print("Processed BIOS versions:", bios_versions)  # 打印查看处理后的数据
+    print("Processed BIOS versions:", bios_versions)
 
     if not bios_versions:
-        return jsonify([])  # 如果列表为空，直接返回空列表
+        return jsonify([])
 
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
-    # 构建 SQL 查询
     format_strings = ','.join(['%s'] * len(bios_versions))
     query = """
     SELECT `BIOS Version`, `Test Case Number`, `Test Case Name`, `Result`, `Comment`

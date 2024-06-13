@@ -1,7 +1,6 @@
 import pandas as pd
 
 def read_excel(file_path):
-    """ 讀取 Excel 檔案 """
     try:
         return pd.read_excel(file_path)
     except Exception as e:
@@ -11,7 +10,6 @@ def read_excel(file_path):
 
 def process_dataframe(df, task_id=None):
     
-    """ 處理 DataFrame：重命名、過濾和清理數據 """
     try:
         if task_id:
             original_header = df.columns[0]
@@ -32,7 +30,6 @@ def process_dataframe(df, task_id=None):
 
 
 def process_and_ignore_np(df):
-    """ 遍歷每一行，合併非 'NP' 值到 C 欄 """
     try:
         new_rows = []
         for index, row in df.iterrows():
@@ -57,7 +54,6 @@ def process_and_ignore_np(df):
         return pd.DataFrame()
 
 def save_to_excel(df, output_path):
-    """ 儲存 DataFrame 到 Excel 檔案 """
     try:
         df.to_excel(output_path, index=False)
     except Exception as e:
@@ -66,7 +62,6 @@ def save_to_excel(df, output_path):
 
 
 def process_file(file_path, output_path):
-    """处理上传的文件并保存为 XLSX"""
     task_id = 'SC'
     df = read_excel(file_path)
     result_df = process_dataframe(df, task_id)

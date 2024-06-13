@@ -49,7 +49,6 @@
             </div>
         
                 <div id="summary-table-container">
-                    <!-- Summary table will be generated here -->
                 </div>
                 <br>
                 <h4 class="title"><b>Comparison Summary</b></h4>
@@ -67,7 +66,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- 這裡將動態填充詳細信息 -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -78,17 +76,13 @@
     </div>  
     <script>
         $(document).ready(function() {
-            var dataTableInstance = null;  // 用來追踪 DataTable 實例
-
-            // Initialize select2 on the task-id-select element
+            var dataTableInstance = null; 
             $('#task-id-select').select2({
                 placeholder: "Select Task ID",
                 allowClear: true,
                 width: '100%',
             })
-            // 一旦 AJAX 调用完成并且表格被生成后初始化 DataTables
 
-    // 更改事件处理程序，以在 AJAX 成功后调用 initializeDataTable
     $('#task-id-select').on('change', function() {
         var taskIds = $(this).val();
         $('#summary-table-container').empty();
@@ -103,8 +97,8 @@
                     generateSummaryTable(taskIds, response);
                 },
                 error: function(error) {
-                    console.error("加載測試用例出錯: ", error);
-                    $('#summary-table-container').html('<p>加載測試用例出錯。</p>');
+                    console.error("error: ", error);
+                    $('#summary-table-container').html('<p>error</p>');
                 }
             });
         } else {
@@ -148,7 +142,7 @@ function generateSummaryTable(taskIds, data) {
             var highlight = hasFail ? ' style="background-color: #FFFCCC;"' : '';
 
             table += `<tr><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
-            if (hasFail) { // Add rows to the summary table for failed cases without highlight
+            if (hasFail) { 
                 summaryTable += `<tr><td>${fullCaseTitle.split('(')[0].trim()}</td>`;
             }
 
@@ -158,7 +152,7 @@ function generateSummaryTable(taskIds, data) {
                 var link = `<a href="#" class="result-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-item='${JSON.stringify(item)}'>${result}</a>`;
                 table += `<td${highlight}>${link}</td>`;
                 if (hasFail) {
-                    summaryTable += `<td>${link}</td>`; // Add plain data without highlight
+                    summaryTable += `<td>${link}</td>`; 
                 }
             });
 
@@ -186,7 +180,6 @@ function reinitializeDataTables(tableId, searchPlaceholder) {
         $(tableId).DataTable().destroy();
     }
 
-    // 基础配置
     var dataTableOptions = {
         searching: true,
         autoWidth: true,
@@ -206,9 +199,8 @@ function reinitializeDataTables(tableId, searchPlaceholder) {
         }
     };
 
-    // 如果是摘要表格，添加 Excel 导出按钮
     if (tableId === '#summary-highlight-table') {
-        dataTableOptions.dom = 'Bfrtip';  // Enable buttons and other elements
+        dataTableOptions.dom = 'Bfrtip';
         dataTableOptions.buttons = [
             {
                 extend: 'excelHtml5',
@@ -243,27 +235,23 @@ function reinitializeDataTables(tableId, searchPlaceholder) {
              }
         ];
     }
-
-    // 初始化 DataTables
     $(tableId).DataTable(dataTableOptions);
 }
 
 $(document).on('click', '.result-link', function() {
     var item = $(this).data('item');
     var modalBody = $('#detailsModal .modal-body');
-    modalBody.empty(); // 清空之前的內容
+    modalBody.empty(); 
 
-    // 建立一個新的表格來顯示詳細信息，並添加 table-striped 類
     var table = '<table class="table table-striped">';
     table += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
 
-    // 填充表格內容
     Object.keys(item).forEach(function(key) {
         table += `<tr><td>${key}</td><td>${item[key]}</td></tr>`;
     });
 
     table += '</tbody></table>';
-    modalBody.append(table); // 將表格添加到模態框的主體中
+    modalBody.append(table);
 });
 
 $('#task-id-select').on('change', function() {
@@ -283,7 +271,7 @@ $('#task-id-select').on('change', function() {
         });
     } else {
         $('#summary-table-container').empty();
-        $('#summary-highlight-container').empty(); // 清空摘要容器
+        $('#summary-highlight-container').empty();
     }
 });
 
@@ -308,12 +296,12 @@ $('#task-id-select').on('change', function() {
 
     #summary-table-container {
         margin-top: 20px;
-        max-height: 600px;
+        max-height: 800px;
         overflow-y: auto; 
     }
 
     #summary-highlight-container {
-        max-height: 600px; 
+        max-height: 800px; 
         overflow-y: auto;  
     }
 

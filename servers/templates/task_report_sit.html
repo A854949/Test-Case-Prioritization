@@ -61,8 +61,6 @@
             </div>
         </div>
     
-        
-        <!-- 模態彈窗結構 -->
         <div id="taskReportModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
@@ -229,7 +227,7 @@
     if (response.headers.get('Content-Type').includes('application/json')) {
         return response.json();
     } else {
-        throw new Error('收到非 JSON 回應');
+        throw new Error('error');
     }
 })
 .then(data => {
@@ -385,22 +383,17 @@ function uploadFile(formData) {
         }
         document.getElementById('file').addEventListener('change', function() {
             if (currentMode === 'edit') {
-        return;  // 直接返回，不进行任何操作
+        return; 
     }
     var file = this.files[0];
     if (file) {
         var filename = file.name;
-        // 假设 "matrix" 后面跟随的是TaskID，且 "matrix" 是文件名中的一个标识符
         var index = filename.toLowerCase().indexOf('martrix');
         if (index !== -1) {
-            // 提取 "matrix" 之后的所有字符作为 TaskID
             var taskId = filename.substring(index + 'martrix'.length).trim();
-            // 如果文件名以数字或其他标识符结束，可以进一步处理taskId来适应格式
-            // 例如，如果taskId包含文件扩展名，需要去掉
             if (taskId.lastIndexOf('.') !== -1) {
                 taskId = taskId.substring(0, taskId.lastIndexOf('.'));
             }
-            // 设置 TaskID 输入框的值
             document.getElementById('taskId').value = taskId;
         } else {
             alert('Filename does not contain the identifier "martrix". Please check the file name.');
@@ -409,7 +402,7 @@ function uploadFile(formData) {
 });
 
         
-        </script>
+</script>
         
 
 
@@ -430,56 +423,56 @@ function uploadFile(formData) {
     max-width: 90%; 
 }   
 
-    #outputTable {
-        width: 100%;
-        overflow-x: auto;
-        border-collapse: collapse;
-        margin-top: 20px !important;
-    }
+#outputTable {
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin-top: 20px !important;
+}
 
-    #outputTable th,
-    #outputTable td {
-        border: 1px solid #ddd; 
-        padding: 8px;
-        text-align: left; 
-        white-space: nowrap;
-    }
+#outputTable th,
+#outputTable td {
+    border: 1px solid #ddd; 
+    padding: 8px;
+    text-align: left; 
+    white-space: nowrap;
+}
 
 
-    #outputTable th {
-        background-color: #b5e4f5; 
-    }
+#outputTable th {
+    background-color: #b5e4f5; 
+}
 
-    #outputTable tbody tr:hover {
-        background-color: #f6f6f6;
-    }
+#outputTable tbody tr:hover {
+    background-color: #f6f6f6;
+}
 
-    .dataTables_length label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
+.dataTables_length label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
 
-    .dataTables_length label > select {
-        margin-left: 8px;  
-        margin-right: 8px; 
-    }
+.dataTables_length label > select {
+    margin-left: 8px;  
+    margin-right: 8px; 
+}
 
-    #addTaskReportBtn {
-        position: relative;
-        margin-bottom: -35px;
-        float: left;
-        z-index: 1;
-    }
+#addTaskReportBtn {
+    position: relative;
+    margin-bottom: -35px;
+    float: left;
+    z-index: 1;
+}
 
-    div.dataTables_wrapper div.dataTables_filter label {
-        font-weight: normal;
-        white-space: nowrap;
-        text-align: left;
-        margin-bottom: 10px;
-    }
+div.dataTables_wrapper div.dataTables_filter label {
+    font-weight: normal;
+    white-space: nowrap;
+    text-align: left;
+    margin-bottom: 10px;
+}
 
-    .form-row {
+.form-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
@@ -560,31 +553,31 @@ input.btn.btn-primary:hover {
 }
 
 
-    .modal-content .close {
-        margin-left: auto;
-        color: #45454588; 
-        background-color: white; 
-        border: 0; 
-        padding: 0 10px; 
-        font-size: 1.5rem;
-        border-radius: 50%;
-        cursor: pointer; 
+.modal-content .close {
+    margin-left: auto;
+    color: #45454588; 
+    background-color: white; 
+    border: 0; 
+    padding: 0 10px; 
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer; 
         
-    }
+}
 
-    .modal-content .close:hover {
-        background-color:  #dcdcdc;     
-    }
+.modal-content .close:hover {
+    background-color:  #dcdcdc;     
+}
 
-    .gray-background {
-        background-color: #f2f2f2; 
-        padding: 2px 5px; 
-        margin-top: 10px;
-    }
+.gray-background {
+    background-color: #f2f2f2; 
+    padding: 2px 5px; 
+    margin-top: 10px;
+}
     
-    .form-control:disabled:hover {
-        cursor: not-allowed;
-    }
+.form-control:disabled:hover {
+    cursor: not-allowed;
+}
 
 </style>
 

@@ -3,7 +3,6 @@ import re
 
 
 def transfer_min_to_hours(min_str):
-    """將包含分鐘數的字串轉換成小時數。支持處理像 '600/10728' 這樣的字串，將其拆分並分別轉換。"""
     cleaned_str = min_str.replace('_x000D_', '')
     parts = cleaned_str.split('/')
     hours_list = []
@@ -21,7 +20,6 @@ def transfer_min_to_hours(min_str):
 
 
 def parser2_process(input_file_path, output_file_path):
-    """將Excel檔案中的'C'欄位內容轉換成DataFrame的欄位"""
     headers = [
         "Pass/Fail",
         "Tester",

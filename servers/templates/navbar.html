@@ -49,18 +49,6 @@
                         </ul>
                     </li>
                     
-                    
-    
-                    <!-- <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Dropdown link
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li> -->
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if session.get('username') %}
@@ -90,38 +78,28 @@
 
 <script>
     $(document).ready(function() {
-        // 獲取當前頁面的 URL
         var currentUrl = window.location.href;
 
-        // 遍歷所有導航鏈接
         $('.navbar-nav .nav-link').each(function() {
             var linkUrl = $(this).attr('href');
 
-            // 如果導航鏈接的地址與當前頁面的 URL 匹配
             if (currentUrl.includes(linkUrl)) {
-                // 為匹配的鏈接添加 'active' 類
                 $(this).addClass('active');
 
-                // 如果該鏈接是下拉菜單中的選項，則將其父級下拉菜單也設置為 'active'
                 if ($(this).parents('.dropdown-menu').length > 0) {
                     $(this).parents('.dropdown-menu').prev('.dropdown-toggle').addClass('active');
                 }
             }
         });
         if (currentUrl.includes('/test_case_sit') || currentUrl.includes('/test_case_bios')) {
-            // 將 "Add Task Report" 選項設置為粗體
             $('#testCaseDropdownMenuLink').addClass('active');
         }
 
-        // 檢查是否選擇了 "Add Task Report" 下的 "SIT" 或 "BIOS"
         if (currentUrl.includes('/task_report_sit') || currentUrl.includes('/task_report_bios')) {
-            // 將 "Add Task Report" 選項設置為粗體
             $('#addTaskReportDropdownMenuLink').addClass('active');
         }
 
-        // 檢查是否選擇了 "Comparison" 下的 "SIT" 或 "BIOS"
         if (currentUrl.includes('/comparison_sit') || currentUrl.includes('/comparison_bios')) {
-            // 將 "Comparison" 選項設置為粗體
             $('#comparisonDropdown').addClass('active');
         }
     });

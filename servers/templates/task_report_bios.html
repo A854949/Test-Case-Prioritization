@@ -57,8 +57,6 @@
             </div>
         </div>
     
-        
-        <!-- 模態彈窗結構 -->
         <div id="taskReportModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
@@ -190,7 +188,7 @@
     if (response.headers.get('Content-Type').includes('application/json')) {
         return response.json();
     } else {
-        throw new Error('收到非 JSON 回應');
+        throw new Error('error');
     }
 })
 .then(data => {
@@ -341,9 +339,8 @@ function uploadFile(formData) {
             return existingBiosVersions.includes(biosVersion);
         }
         document.getElementById('file').addEventListener('change', function() {
-    // 如果是编辑模式，则不执行任何操作
     if (currentMode === 'edit') {
-        return;  // 直接返回，不进行任何操作
+        return; 
     }
 
     var file = this.files[0]; 
@@ -352,7 +349,6 @@ function uploadFile(formData) {
         var newBiosVersion = filename.substring(0, filename.lastIndexOf('.')) || filename;
         var currentBiosVersion = document.getElementById('biosVersion').value;
 
-        // 仅在非编辑模式下，如果新BIOS版本与当前版本不同，才更新
         if (newBiosVersion !== currentBiosVersion) {
             document.getElementById('biosVersion').value = newBiosVersion;
         }
