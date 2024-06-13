@@ -23,7 +23,7 @@ This system is a Flask-based web application that provides test report managemen
 
    Upon successful execution, the terminal will display something like:
    ```plaintext
-   * Running on http://0.0.0.0:5010/ (Press CTRL+C to quit)
+   * Running on http://15.34.25.120:5010/ (Press CTRL+C to quit)
 
 ### Access the Web Pages
 
@@ -38,8 +38,17 @@ This system is a Flask-based web application that provides test report managemen
    ```plaintext
    http://15.34.25.120:5010/
 
+   You should see the home page load.
 
-   	  
+### Create Database and Tables (If setting up the server on another computer)
+
+1. **Create Database**
+
+   Log in to MySQL and create a database named `test`:
+   ```sql
+   CREATE DATABASE test;
+
+
 CREATE TABLE testCase (
     `UUID` CHAR(36) NOT NULL,
     `Task ID` VARCHAR(20),
