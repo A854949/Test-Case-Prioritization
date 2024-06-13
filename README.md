@@ -25,6 +25,8 @@ This system is a Flask-based web application that provides test report managemen
    ```plaintext
    * Running on http://15.34.25.120:5010/ (Press CTRL+C to quit)
 
+		![image](https://github.com/A854949/TestCasePrioritization/assets/82749575/9e456921-610c-482c-86c2-ff48d181470c)
+
 ### Access the Web Pages
 
 1. **Open Browser**
