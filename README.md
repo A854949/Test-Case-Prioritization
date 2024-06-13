@@ -29,14 +29,14 @@ This system is a Flask-based web application that provides test report managemen
 
 1. **Open Browser**
 
-   - Open your preferred web browser.
+   Open your preferred web browser.
 
 2. **Access the Home Page**
 
-   - Enter the following URL in the address bar and visit:
-     ```plaintext
-   * http://15.34.25.120:5010/
-	You should see the home page load.
+   Enter the following URL in the address bar and visit:
+
+   ```plaintext
+   http://15.34.25.120:5010/
 
 
    	  
