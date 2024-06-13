@@ -1,5 +1,28 @@
-# TestCasePrioritization
-MySQL
+# Test Case Prioritization Handover Document
+## System Overview
+
+This system is a Flask-based web application that provides test report management and comparison features, including user registration, login, task report creation, editing, deletion, and comparison.
+
+## Startup Steps
+
+### Start the Server in VS Code
+
+1. **Open VS Code**
+
+   Open VS Code and ensure your project files are in the workspace.
+
+2. **Open `server.py` File**
+
+   Find the `server.py` file in the project directory and click to open it.
+
+3. **Run the Server**
+
+   In the opened `server.py` file, right-click in the file content area and select “Run Python File” or simply click the green run button (with a play symbol) in the top-right corner.
+
+   Upon successful execution, the terminal will display something like:
+   ```plaintext
+   * Running on http://0.0.0.0:5010/ (Press CTRL+C to quit)
+
 
 CREATE TABLE testCase (
     `UUID` CHAR(36) NOT NULL,
