@@ -39,7 +39,7 @@ This system is a Flask-based web application that provides test report managemen
 
    http://15.34.25.120:5010/
 
-You should see the home page load.
+   You should see the home page load.
 
 ## MySQL Database Setup (If setting up the server on another computer)
 
